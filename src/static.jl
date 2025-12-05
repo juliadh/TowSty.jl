@@ -109,9 +109,11 @@ Generate an article page.
 * `article`: Article data dictionary
 """
 function staticarticlepage(outputdir::String, article::Dict)
-  slugparts = splitpath(article[:slugtitle])
+  slugtitle = article[:slugtitle]
+  slugparts = splitpath(slugtitle)
+  
   if length(slugparts) < 2
-    @warn "Invalid slug for article: $(article[:slugtitle])"
+    @warn "Invalid slug for article: $slugtitle"
     return
   end
 
@@ -121,19 +123,19 @@ function staticarticlepage(outputdir::String, article::Dict)
   data = getarticle(corpusname, articleslug)
 
   if get(data, :error, false)
-    @warn "Unable to generate page for article: $(article[:slugtitle])"
+    @warn "Unable to generate page for article: $slugtitle"
     return
   end
 
   templatepath = joinpath(TEMPLATES_PATH, "articles.html")
   html = templaterender_static(templatepath, data)
 
-  # Create the corpus directory if necessary
-  corpusdir = joinpath(outputdir, corpusname)
-  mkpath(corpusdir)
+  # Create the article directory using the full slug path
+  articledir = joinpath(outputdir, slugtitle)
+  mkpath(articledir)
 
-  # Write the HTML file directly (no subdirectory)
-  filepath = joinpath(corpusdir, "$articleslug.html")
+  # Write the HTML file as index.html
+  filepath = joinpath(articledir, "index.html")
   write(filepath, html)
 end
 
