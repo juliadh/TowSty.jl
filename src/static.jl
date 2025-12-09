@@ -109,29 +109,29 @@ Generate an article page.
 * `article`: Article data dictionary
 """
 function staticarticlepage(outputdir::String, article::Dict)
-  slugtitle = article[:slugtitle]
-  slugparts = splitpath(slugtitle)
+  path = article[:path]
+  pathparts = splitpath(path)
   
-  if length(slugparts) < 2
-    @warn "Invalid slug for article: $slugtitle"
+  if length(pathparts) < 2
+    @warn "Invalid path for article: $path"
     return
   end
 
-  corpusname = slugparts[1]
-  articleslug = slugparts[2]
+  corpusname = pathparts[1]
+  articlepath = pathparts[2]
 
-  data = getarticle(corpusname, articleslug)
+  data = getarticle(corpusname, articlepath)
 
   if get(data, :error, false)
-    @warn "Unable to generate page for article: $slugtitle"
+    @warn "Unable to generate page for article: $path"
     return
   end
 
   templatepath = joinpath(TEMPLATES_PATH, "articles.html")
   html = templaterender_static(templatepath, data)
 
-  # Create the article directory using the full slug path
-  articledir = joinpath(outputdir, slugtitle)
+  # Create the article directory using the full path
+  articledir = joinpath(outputdir, path)
   mkpath(articledir)
 
   # Write the HTML file as index.html

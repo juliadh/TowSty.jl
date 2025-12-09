@@ -31,6 +31,7 @@ function getworkspace(workspaceid, apikey)
     query getWorkspace {
       workspace(workspaceId: "$(workspaceid)"){
         name
+        description
         articles{
           _id
           title
@@ -43,6 +44,7 @@ function getworkspace(workspaceid, apikey)
         corpus{
           _id
           name
+          description
           metadata
           articles{
             article{

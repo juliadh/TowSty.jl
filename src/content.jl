@@ -44,7 +44,9 @@ Get data for the home page.
 Retrieves all corpuses available in the system.
 """
 function gethome()
-  data = Dict( :corpuses => corpuses() )
+  data = Dict(
+    :meta => meta()
+  )
 
   return data
 end
@@ -65,6 +67,7 @@ function getcorpus(corpusname::String)
     return Dict(
       :error => true,
       :message => "Corpus introuvable",
+      :workspacename => workspace()[:name],
       :corpuses => allcorpuses,
       :corpus => nothing,
       :articles => []
@@ -72,11 +75,15 @@ function getcorpus(corpusname::String)
   end
 
   data = Dict(
-    :corpuses => allcorpuses,
-    :corpus => matches[1],
-    :articles => filter(a -> a[:corpus] == corpusname, articles())
+    :meta => meta(),
+    :content => Dict(
+      :corpusname => matches[1][:name],
+      :id => matches[1][:_id],
+      :description => matches[1][:description],
+      :articles => filter(a -> a[:corpus] == corpusname, articles())
+    )
   )
-  
+
   return data
 end
 
@@ -92,7 +99,7 @@ with citations. If the article is not found, returns an error structure.
 """
 function getarticle(corpusname::String, article::String)
   list = articles()
-  articleidx = findfirst(a -> a[:slugtitle] == joinpath(corpusname, article), list)
+  articleidx = findfirst(a -> a[:path] == joinpath(corpusname, article), list)
 
   if articleidx === nothing
     return Dict(
@@ -105,9 +112,33 @@ function getarticle(corpusname::String, article::String)
 
   article = list[articleidx]
   data = Dict(
-    :corpuses => corpuses(),
-    :content => Dict(:md => article[:md], :bib => article[:bib]) |> processarticle,
-    :title => article[:title]
+    :meta => meta(),
+    :content => Dict(
+      :id => article[:_id],
+      :title => article[:title],
+      :article => article[:html]
+    )
+  )
+
+  return data
+end
+
+"""
+    getbibliography()
+
+Get general bibliography
+Retrieves and processes the general bibliography, converting Markdown to HTML
+with citations.
+"""
+function getbibliography()
+  bibliography = generalbibliography()
+  data = Dict(
+    :meta => meta(),
+    :content => Dict(
+      :id => bibliography[:_id],
+      :title => bibliography[:title],
+      :article => bibliography[:html]
+    )
   )
 
   return data
