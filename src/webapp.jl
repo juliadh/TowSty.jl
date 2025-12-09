@@ -40,7 +40,7 @@ function webapp()
     return data
   end
 
-  @get "/articles" function()
+  @get "/articles.json" function()
     data = articles()
 
     return data
