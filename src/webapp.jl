@@ -106,7 +106,7 @@ function webapp()
           </html>
       """
     render = otera(template)
-    ensure_data_loaded()
+    reload_data!()
     return Base.invokelatest(render, message)
   end
 

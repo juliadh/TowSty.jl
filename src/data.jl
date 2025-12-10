@@ -87,6 +87,11 @@ function ensure_data_loaded()
   return DATA_CACHE[]
 end
 
+function reload_data!()
+  DATA_CACHE[] = Dict()
+  return ensure_data_loaded()
+end
+
 function workspace()
   return ensure_data_loaded()[:workspace]
 end
