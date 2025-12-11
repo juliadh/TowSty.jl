@@ -1,6 +1,6 @@
 # TowSty.jl
 
-@todo description
+TowSty is a webapp and static site generator for [Stylo](https://stylo.huma-num.fr/). It allows to deploy a research blog from a Stylo Workspace.
 
 ## Getting started
 
