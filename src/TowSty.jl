@@ -26,9 +26,11 @@ const BIB_PATH = joinpath(TEMP_PATH, "bib.bib")
 
 # fichier csl / citations bibliographiques
 const CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")
+#==
 if !isfile(CSL_PATH)
 	error("style.csl file not found in: " * CSL_PATH)
 end
+==#
 
 include("utils.jl")
 include("apistylo.jl")
