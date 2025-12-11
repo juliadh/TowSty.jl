@@ -58,7 +58,9 @@ function standardizearticle(article::Dict, corpusname::String)
   article[:bib] = article[:workingVersion][:bib]
   article[:yaml] = article[:workingVersion][:yaml]
   article[:corpus] = corpusname
-  article[:html] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> processarticle
+  article[:html] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntohtml
+  article[:plain] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntoplain
+
 
   delete!(article, :workingVersion)
 

@@ -1,5 +1,5 @@
 """
-    processarticle(article::Dict)
+    markdowntohtml(article::Dict)
 
 Process an article by converting its Markdown content to HTML with citations.
 Creates a temporary bibliography file, runs Pandoc with citeproc to process citations,
@@ -7,7 +7,7 @@ and cleans up the temporary file. Uses CSL for citation formatting.
 
 * `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) fields
 """
-function processarticle(article::Dict)
+function markdowntohtml(article::Dict)
   write(BIB_PATH, article[:bib])
   markdown = run(Pandoc.Converter(input=article[:md], bibliography=BIB_PATH, csl=CSL_PATH, citeproc=true))
   rm(BIB_PATH)
@@ -24,7 +24,7 @@ Convert Markdown input to HTML.
 """
 function markdowntohtml(markdown::String)
   html = run(Pandoc.Converter(input=markdown))
-  
+
   return html
 end
 
@@ -38,6 +38,24 @@ Convert Markdown input to plain text.
 function markdowntoplain(md)
   return run(Pandoc.Converter(input=md, from="markdown", to="plain"))
 end
+
+"""
+    markdowntoplain(article::Dict)
+
+Process an article by converting its Markdown content to plain with citations.
+Creates a temporary bibliography file, runs Pandoc with citeproc to process citations,
+and cleans up the temporary file. Uses CSL for citation formatting.
+
+* `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) fields
+"""
+function markdowntoplain(article::Dict)
+  write(BIB_PATH, article[:bib])
+  markdown = run(Pandoc.Converter(input=article[:md], from="markdown", to="plain", bibliography=BIB_PATH, csl=CSL_PATH, citeproc=true))
+  rm(BIB_PATH)
+
+  return markdown
+end
+
 
 """
     stripyamlheader(md::String)
