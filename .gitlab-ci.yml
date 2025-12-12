@@ -1,0 +1,30 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+build-docs:
+  stage: build
+  image: julia:1.12
+  script:
+    #- julia --project=docs -e 'using Pkg; Pkg.add("Documenter")'
+    - julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+    - julia --project=docs docs/make.jl
+  artifacts:
+    paths:
+      - docs/build/
+    expire_in: 1 week
+
+pages:
+  stage: deploy
+  script:
+    - mv docs/build public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+
+

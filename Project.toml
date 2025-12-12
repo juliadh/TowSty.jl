@@ -3,6 +3,9 @@ uuid = "868292e2-f7aa-4e91-a674-807902015840"
 version = "0.1.0"
 authors = ["Josselin Morvan <morvan.josselin@gmail.com>"]
 
+[workspace]
+projects = ["docs"]
+
 [deps]
 GraphQLClient = "09d831e3-9c21-47a9-bfd8-076871817219"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
