@@ -28,7 +28,7 @@ const BIB_PATH = joinpath(TEMP_PATH, "bib.bib")
 const CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")
 #==
 if !isfile(CSL_PATH)
-	error("style.csl file not found in: " * CSL_PATH)
+  error("style.csl file not found in: " * CSL_PATH)
 end
 ==#
 
