@@ -113,11 +113,12 @@ function getarticle(corpusname::String, article::String)
   article = list[articleidx]
   data = Dict(
     :meta => meta(),
-    :content => Dict(
+    :content => article
+    #==:content => Dict(
       :id => article[:_id],
       :title => article[:title],
       :article => article[:html]
-    )
+    )==#
   )
 
   return data
