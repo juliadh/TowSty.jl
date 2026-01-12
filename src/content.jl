@@ -62,7 +62,9 @@ returns an error structure.
 """
 function getcorpus(corpusname::String)
   allcorpuses = corpuses()
-  matches = filter(c -> c[:normalizedname] == corpusname, allcorpuses)
+  matches = filter(c -> c[:path] == corpusname, allcorpuses)
+  corpus = matches[1]
+
   if isempty(matches)
     return Dict(
       :error => true,
@@ -74,18 +76,23 @@ function getcorpus(corpusname::String)
     )
   end
 
-  meta = meta()
-  meta[:breadcrumb] = [
-    Dict(:label => matches[1][:name], :url => matches[1][:normalizedname])
+  metadata = meta()
+  metadata[:corpus] = Dict()
+  metadata[:corpus][:path] = corpus[:path]
+  metadata[:corpus][:name] = corpus[:name]
+
+  metadata[:breadcrumb] = [
+    Dict(:name => corpus[:name], :path => corpus[:path])
   ]
 
+
   data = Dict(
-    :meta => meta,
+    :meta => metadata,
     :content => Dict(
-      :corpusname => matches[1][:name],
-      :id => matches[1][:_id],
-      :description => matches[1][:description],
-      :articles => filter(a -> a[:corpus] == corpusname, articles())
+      :corpusname => corpus[:name],
+      :id => corpus[:_id],
+      :description => corpus[:description],
+      :articles => filter(a -> a[:corpus][:path] == corpusname, articles())
     )
   )
 
@@ -103,6 +110,8 @@ with citations. If the article is not found, returns an error structure.
 * `article::String`: Article slug/identifier
 """
 function getarticle(corpusname::String, article::String)
+  corpus = getcorpus(corpusname)
+
   list = articles()
   articleidx = findfirst(a -> a[:path] == joinpath(corpusname, article), list)
 
@@ -116,6 +125,11 @@ function getarticle(corpusname::String, article::String)
   end
 
   article = list[articleidx]
+  metadata = corpus[:meta]
+  breadcrumb = Dict(:name => article[:title], :path => article[:path] )
+  push!(metadata[:breadcrumb], breadcrumb)
+
+
   data = Dict(
     :meta => meta(),
     :content => article

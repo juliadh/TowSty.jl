@@ -35,6 +35,15 @@ function getworkspace(workspaceid, apikey)
         articles{
           _id
           title
+          createdAt
+          owner {
+            displayName
+            username
+            email
+          }
+          contributors{
+            user{ displayName }
+          }
           workingVersion{
             md
             yaml
@@ -48,8 +57,9 @@ function getworkspace(workspaceid, apikey)
           metadata
           articles{
             article{
-              title
               _id
+              title
+              createdAt
               owner {
                 displayName
                 username

@@ -92,7 +92,7 @@ Generate a corpus page.
 * `corpus`: Corpus data dictionary
 """
 function staticcorpuspage(outputdir::String, corpus::Dict)
-  corpusname = corpus[:normalizedname]
+  corpusname = corpus[:path]
   data = getcorpus(corpusname)
 
   if get(data, :error, false)

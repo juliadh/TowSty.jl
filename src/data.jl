@@ -14,7 +14,7 @@ function standardizedata(workspace::Dict)
   bibliography = processbibliography(workspace[:articles])
   #append!( articles, [bibliography] )
 
-  sorted = sort(articles, by = x -> x[:date])
+  sorted = sort(articles, by = x -> x[:createdAt])
 
   return Dict(
     :workspace => workspace,
@@ -24,32 +24,36 @@ function standardizedata(workspace::Dict)
     :meta => Dict(
       :workspacename => workspace[:name],
       :nav => vcat(
-        [Dict(:name => c[:name], :normalizedname => c[:normalizedname]) for c in corpuses],
-        !isnothing(bibliography) ? [Dict(:name => "Bibliographie", :normalizedname => "bibliographie")] : []
+        [Dict(:name => c[:name], :path => c[:path]) for c in corpuses],
+        !isnothing(bibliography) ? [Dict(:name => "Bibliographie", :path => "bibliographie")] : []
       )
     )
   )
 end
 
 function standardizecorpus(corpus::Dict)
-  corpus[:normalizedname] = Unicode.normalize(corpus[:name], stripmark=true) |> Unicode.lowercase
-  corpus[:articles] = standardizearticles(corpus[:articles], corpus[:normalizedname])
+  corpus[:path] = normalizelabel(corpus[:name], slug=true)
+  corpusinfo = Dict(
+    :name => corpus[:name],
+    :path => corpus[:path]
+  )
+  corpus[:articles] = standardizearticles(corpus[:articles], corpusinfo)
   corpus[:description] = markdowntohtml(corpus[:description])
 
   return corpus
 end
 
-function standardizearticles(articles::Vector, corpusname::String)
-  formatedarticles = [standardizearticle(article, corpusname) for article in articles]
-  sorted = sort(formatedarticles, by = x -> x[:date])
+function standardizearticles(articles::Vector, corpusinfo::Dict)
+  formatedarticles = [standardizearticle(article, corpusinfo) for article in articles]
+  sorted = sort(formatedarticles, by = x -> x[:createdAt])
   return sorted
 end
 
-function standardizearticle(article::Dict, corpusname::String)
+function standardizearticle(article::Dict, corpusinfo::Dict)
   article = article[:article]
   yaml = getYamlFromMarkdown(article[:workingVersion][:md]) |> string2symbol
   yamltitle = markdowntoplain(yaml[:title])
-  yaml[:path] = joinpath( corpusname, slugify( yamltitle ) )
+  yaml[:path] = joinpath( corpusinfo[:path], normalizelabel( yamltitle, slug=true ) )
   yaml[:title] = markdowntohtml( yaml[:title] ) |> stripparagraph |> String
 
   merge!(article, yaml)
@@ -57,7 +61,7 @@ function standardizearticle(article::Dict, corpusname::String)
   article[:md] = article[:workingVersion][:md]
   article[:bib] = article[:workingVersion][:bib]
   article[:yaml] = article[:workingVersion][:yaml]
-  article[:corpus] = corpusname
+  article[:corpus] = corpusinfo
   article[:html] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntohtml
   article[:plain] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntoplain
 
@@ -70,7 +74,7 @@ end
 function processbibliography(articles::Vector)
   article = filter(a -> a[:title] == "__bibliographie", articles)
   if length(article) != 0
-    bibliography = standardizearticle(Dict(:article => article[1]), "")
+    bibliography = standardizearticle(Dict(:article => article[1]), Dict(:name => "", :path => ""))
     return bibliography
   else
     return nothing

@@ -156,3 +156,18 @@ function getYamlFromMarkdown(markdown)
     return YAML.load(join(yaml_lines, "\n"))
   end
 end
+
+"""
+    normalizelabel(label::String)
+
+This function normalize a label used for corpus or article path.
+"""
+function normalizelabel(label::String; slug::Bool=false)
+  normalizedlabel = Unicode.normalize(label, stripmark=true) |> Unicode.lowercase
+
+  if (slug)
+    return slugify(normalizedlabel)
+  else
+    return normalizedlabel
+  end
+end
