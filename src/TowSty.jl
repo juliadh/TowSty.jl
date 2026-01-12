@@ -10,7 +10,7 @@ using YAML
 using Slugify
 using Unicode
 
-const PROJECT_PATH = pwd()
+const PROJECT_PATH = pkgdir(@__MODULE__)
 const ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
 const TEMP_PATH = joinpath(PROJECT_PATH, "temp")
 const TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
