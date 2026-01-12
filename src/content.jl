@@ -74,8 +74,13 @@ function getcorpus(corpusname::String)
     )
   end
 
+  meta = meta()
+  meta[:breadcrumb] = [
+    Dict(:label => matches[1][:name], :url => matches[1][:normalizedname])
+  ]
+
   data = Dict(
-    :meta => meta(),
+    :meta => meta,
     :content => Dict(
       :corpusname => matches[1][:name],
       :id => matches[1][:_id],
