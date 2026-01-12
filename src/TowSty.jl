@@ -10,11 +10,13 @@ using YAML
 using Slugify
 using Unicode
 
-const PROJECT_PATH = pkgdir(@__MODULE__)
-const ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
-const TEMP_PATH = joinpath(PROJECT_PATH, "temp")
-const TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
-const DATA_PATH = joinpath(pwd(), "content", "workspace.json")
+function __init__()
+  global PROJECT_PATH = pwd()
+  global ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
+  global TEMP_PATH = joinpath(PROJECT_PATH, "temp")
+  global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
+  global DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
+end
 #==
 #if !isfile(DATA_PATH)
   error("Workspace.json file not found in: " * DATA_PATH)
