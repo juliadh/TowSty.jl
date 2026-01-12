@@ -10,29 +10,27 @@ using YAML
 using Slugify
 using Unicode
 
+PROJECT_PATH = ""
+ASSETS_PATH = ""
+TEMP_PATH = ""
+TEMPLATES_PATH = ""
+DATA_PATH = ""
+BIB_PATH = ""
+CSL_PATH = ""
+
 function __init__()
   global PROJECT_PATH = pwd()
   global ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
   global TEMP_PATH = joinpath(PROJECT_PATH, "temp")
   global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
   global DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
+  
+  # Bibliography files are created on the fly.
+  global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")
+  
+  # fichier csl / citations bibliographiques
+  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")
 end
-#==
-#if !isfile(DATA_PATH)
-  error("Workspace.json file not found in: " * DATA_PATH)
-end
-==#
-
-# Bibliography files are created on the fly.
-const BIB_PATH = joinpath(TEMP_PATH, "bib.bib")
-
-# fichier csl / citations bibliographiques
-const CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")
-#==
-if !isfile(CSL_PATH)
-  error("style.csl file not found in: " * CSL_PATH)
-end
-==#
 
 include("utils.jl")
 include("apistylo.jl")
