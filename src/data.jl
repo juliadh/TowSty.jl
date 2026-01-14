@@ -11,14 +11,22 @@ function standardizedata(workspace::Dict)
     append!(articles, c[:articles])
   end
 
+  articleids = []
+  for article in articles
+    push!(articleids, article[:_id])
+  end
+  orphans = filter(a -> !in(a[:_id], articleids) && a[:title] != "__bibliographie", workspace[:articles])
+  standardizedorphans = [standardizearticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans]
+
   bibliography = processbibliography(workspace[:articles])
   #append!( articles, [bibliography] )
 
-  sorted = sort(articles, by = x -> x[:createdAt])
+  sorted = sort(articles, by = x -> x[:createdAt], rev=true)
 
   return Dict(
     :workspace => workspace,
     :corpuses => corpuses,
+    :orphans => standardizedorphans,
     :articles => sorted,
     :bibliography => !isnothing(bibliography) ? bibliography : nothing,
     :meta => Dict(
@@ -45,7 +53,7 @@ end
 
 function standardizearticles(articles::Vector, corpusinfo::Dict)
   formatedarticles = [standardizearticle(article, corpusinfo) for article in articles]
-  sorted = sort(formatedarticles, by = x -> x[:createdAt])
+  sorted = sort(formatedarticles, by = x -> x[:createdAt], rev=true)
   return sorted
 end
 
@@ -108,6 +116,10 @@ end
 
 function articles()
   return ensure_data_loaded()[:articles]
+end
+
+function orphans()
+  return ensure_data_loaded()[:orphans]
 end
 
 function generalbibliography()

@@ -44,8 +44,16 @@ Get data for the home page.
 Retrieves all corpuses available in the system.
 """
 function gethome()
+  narticles = length(articles())
+  news = narticles >= 5 ? articles()[1:5] : articles()
+
   data = Dict(
-    :meta => meta()
+    :meta => meta(),
+    :content => Dict(
+      :news => news,
+      :orphans => orphans(),
+      :articles => articles()
+    )
   )
 
   return data
@@ -89,8 +97,8 @@ function getcorpus(corpusname::String)
   data = Dict(
     :meta => metadata,
     :content => Dict(
-      :corpusname => corpus[:name],
       :id => corpus[:_id],
+      :name => corpus[:name],
       :description => corpus[:description],
       :articles => filter(a -> a[:corpus][:path] == corpusname, articles())
     )
@@ -157,7 +165,7 @@ function getbibliography()
     :content => Dict(
       :id => bibliography[:_id],
       :title => bibliography[:title],
-      :article => bibliography[:html]
+      :html => bibliography[:html]
     )
   )
 
