@@ -73,7 +73,6 @@ function standardizearticle(article::Dict, corpusinfo::Dict)
   article[:html] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntohtml
   article[:plain] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntoplain
 
-
   delete!(article, :workingVersion)
 
   return article
