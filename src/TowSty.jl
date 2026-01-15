@@ -1,6 +1,5 @@
 module TowSty
 
-using Base: __init__
 using Oxygen
 using Unicode
 using OteraEngine
