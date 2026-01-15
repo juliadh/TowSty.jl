@@ -47,8 +47,8 @@ include("data.jl")
 include("rendering.jl")
 
 # Load content.jl and webapp.jl from project if available
-pimpmytowsty("content.jl")
-pimpmytowsty("webapp.jl")
+#pimpmytowsty("content.jl")
+#pimpmytowsty("webapp.jl")
 
 include("static.jl")
 
