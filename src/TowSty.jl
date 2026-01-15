@@ -1,5 +1,6 @@
 module TowSty
 
+using Base: __init__
 using Oxygen
 using Unicode
 using OteraEngine
@@ -47,8 +48,10 @@ include("data.jl")
 include("rendering.jl")
 
 # Load content.jl and webapp.jl from project if available
-#pimpmytowsty("content.jl")
-#pimpmytowsty("webapp.jl")
+function __init__()
+  pimpmytowsty("content.jl")
+  pimpmytowsty("webapp.jl")
+end
 
 include("static.jl")
 
