@@ -21,10 +21,6 @@ CSL_PATH = ""
 
 include("utils.jl")
 include("apistylo.jl")
-include("data.jl")
-include("rendering.jl")
-include("static.jl")
-
 
 function __init__()
   global PROJECT_PATH = pwd()
@@ -35,6 +31,8 @@ function __init__()
   global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
   global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
 
+
+  include(joinpath(@__DIR__, "data.jl"))
 
   if isfile(joinpath(PROJECT_PATH, "content.jl"))
     include(joinpath(PROJECT_PATH, "content.jl"))
@@ -47,6 +45,10 @@ function __init__()
   else
     include(joinpath(@__DIR__, "webapp.jl"))
   end
+
+  include(joinpath(@__DIR__, "rendering.jl"))
+  include(joinpath(@__DIR__, "static.jl"))
+
 
 end
 
