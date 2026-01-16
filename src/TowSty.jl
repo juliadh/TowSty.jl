@@ -50,7 +50,8 @@ function __init__()
 
   include("static.jl")
 
-  export meta, corpuses, articles, workspace
 end
+
+export meta, corpuses, articles, workspace
 
 end
