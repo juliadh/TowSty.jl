@@ -19,11 +19,15 @@ DATA_PATH = ""
 BIB_PATH = ""
 CSL_PATH = ""
 
+include("utils.jl")
+include("apistylo.jl")
+include("data.jl")
+include("rendering.jl")
+include("static.jl")
+
+
 function __init__()
   global PROJECT_PATH = pwd()
-  pkgdir = @__DIR__
-  @info "Project dir : $PROJECT_PATH"
-  @info "Package dir : $pkgdir"
   global ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
   global TEMP_PATH = joinpath(PROJECT_PATH, "temp")
   global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
@@ -31,24 +35,18 @@ function __init__()
   global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
   global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
 
-  include("utils.jl")
-  include("apistylo.jl")
-  include("data.jl")
-  include("rendering.jl")
 
   if isfile(joinpath(PROJECT_PATH, "content.jl"))
     include(joinpath(PROJECT_PATH, "content.jl"))
   else
-    include("content.jl")
+    include(joinpath(@__DIR__, "content.jl"))
   end
 
   if isfile(joinpath(PROJECT_PATH, "webapp.jl"))
     include(joinpath(PROJECT_PATH, "webapp.jl"))
   else
-    include("webapp.jl")
+    include(joinpath(@__DIR__, "webapp.jl"))
   end
-
-  include("static.jl")
 
 end
 
