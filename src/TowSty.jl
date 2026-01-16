@@ -13,6 +13,9 @@ using Unicode
 
 # Initialize paths at module load time (not in __init__)
 const PROJECT_PATH = pwd()
+pkgdir = @__DIR__
+@info "Project dir : $PROJECT_PATH"
+@info "Package dir : $pkgdir"
 const ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
 const TEMP_PATH = joinpath(PROJECT_PATH, "temp")
 const TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
