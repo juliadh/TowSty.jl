@@ -20,43 +20,14 @@ DATA_PATH = ""
 BIB_PATH = ""
 CSL_PATH = ""
 
+definepaths!()
+
 include("utils.jl")
 include("apistylo.jl")
+include("data.jl")  
+include("rendering.jl")
+include("static.jl")
 
-function __init__()
-  global PROJECT_PATH = pwd()
-  global ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
-  global TEMP_PATH = joinpath(PROJECT_PATH, "temp")
-  global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
-  global DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
-  global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
-  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
-
-
-  include(joinpath(@__DIR__, "data.jl"))
-
-  if isfile(joinpath(PROJECT_PATH, "content.jl"))
-    include(joinpath(PROJECT_PATH, "content.jl"))
-    @info "Loading user-defined content.jl"
-  else
-    include(joinpath(@__DIR__, "content.jl"))
-    @info "Loading content.jl from TowSty"
-  end
-
-  if isfile(joinpath(PROJECT_PATH, "webapp.jl"))
-    include(joinpath(PROJECT_PATH, "webapp.jl"))
-    @info "Loading user-defined webapp.jl"
-  else
-    include(joinpath(@__DIR__, "webapp.jl"))
-    @info "Loading webapp.jl from TowSty"
-  end
-
-  include(joinpath(@__DIR__, "rendering.jl"))
-  include(joinpath(@__DIR__, "static.jl"))
-
-
-end
-
-export meta, corpuses, articles, workspace
+export meta, corpuses, articles, workspace, definepaths!
 
 end
