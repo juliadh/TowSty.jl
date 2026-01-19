@@ -79,6 +79,8 @@ function getworkspace(workspaceid, apikey)
       }
     }
   """
+  definepaths!()
+
   response = GraphQLClient.execute( styloclient(apikey), query )
   data = response.data["workspace"]
   write(DATA_PATH, JSON.json(data))
