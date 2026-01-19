@@ -4,6 +4,7 @@ function loadsources()
 end
 
 function standardizedata(workspace::Dict)
+  print("Processing data...")
   corpuses = [standardizecorpus(corpus) for corpus in workspace[:corpus]]
 
   articles = Vector()
@@ -40,6 +41,7 @@ function standardizedata(workspace::Dict)
 end
 
 function standardizecorpus(corpus::Dict)
+  print("   -> Processing corpus: $(corpus[:name])")
   corpus[:path] = normalizelabel(corpus[:name], slug=true)
   corpusinfo = Dict(
     :name => corpus[:name],
@@ -52,12 +54,14 @@ function standardizecorpus(corpus::Dict)
 end
 
 function standardizearticles(articles::Vector, corpusinfo::Dict)
+  print("       -> Processing articles")
   formatedarticles = [standardizearticle(article, corpusinfo) for article in articles]
   sorted = sort(formatedarticles, by = x -> x[:createdAt], rev=true)
   return sorted
 end
 
 function standardizearticle(article::Dict, corpusinfo::Dict)
+  print("       -> Processing article $(article[:_id])")
   article = article[:article]
   yaml = getYamlFromMarkdown(article[:workingVersion][:md]) |> string2symbol
   yamltitle = markdowntoplain(yaml[:title])
