@@ -2,7 +2,7 @@
 
 julia_version = "1.12.0"
 manifest_format = "2.0"
-project_hash = "fd13a8eed8f0dd923fbd7ebee70bd11d6aed0421"
+project_hash = "ea761b3c280915a72909fd9c75f8683fbfd123c4"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -527,6 +527,13 @@ version = "1.11.0"
 deps = ["GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "Slugify", "Unicode", "YAML"]
 path = "."
 uuid = "868292e2-f7aa-4e91-a674-807902015840"
+version = "0.1.0"
+
+[[deps.TowStyTemplates]]
+git-tree-sha1 = "a3da73a7c677a9065680c771c09035d94c52f254"
+repo-rev = "main"
+repo-url = "git@gitlab.huma-num.fr:ceen/towsty/towstytemplates.jl.git"
+uuid = "26c3e8b2-b2ea-4c13-8a2d-a4d529bbbc89"
 version = "0.1.0"
 
 [[deps.TranscodingStreams]]

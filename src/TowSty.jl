@@ -1,5 +1,6 @@
 module TowSty
 
+using TowStyTemplates
 using Oxygen
 using Unicode
 using OteraEngine
