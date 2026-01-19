@@ -36,14 +36,18 @@ function __init__()
 
   if isfile(joinpath(PROJECT_PATH, "content.jl"))
     include(joinpath(PROJECT_PATH, "content.jl"))
+    @info "Loading user-defined content.jl"
   else
     include(joinpath(@__DIR__, "content.jl"))
+    @info "Loading content.jl from TowSty"
   end
 
   if isfile(joinpath(PROJECT_PATH, "webapp.jl"))
     include(joinpath(PROJECT_PATH, "webapp.jl"))
+    @info "Loading user-defined webapp.jl"
   else
     include(joinpath(@__DIR__, "webapp.jl"))
+    @info "Loading webapp.jl from TowSty"
   end
 
   include(joinpath(@__DIR__, "rendering.jl"))
