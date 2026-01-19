@@ -41,7 +41,7 @@ function standardizedata(workspace::Dict)
 end
 
 function standardizecorpus(corpus::Dict)
-  println("   -> Processing corpus: $(corpus[:name])")
+  println("  -> Processing corpus: $(corpus[:name])")
   corpus[:path] = normalizelabel(corpus[:name], slug=true)
   corpusinfo = Dict(
     :name => corpus[:name],
@@ -54,14 +54,14 @@ function standardizecorpus(corpus::Dict)
 end
 
 function standardizearticles(articles::Vector, corpusinfo::Dict)
-  println("       -> Processing articles")
+  println("      -> Processing articles")
   formatedarticles = [standardizearticle(article, corpusinfo) for article in articles]
   sorted = sort(formatedarticles, by = x -> x[:createdAt], rev=true)
   return sorted
 end
 
 function standardizearticle(article::Dict, corpusinfo::Dict)
-  print("       -> Processing article $(article[:article][:_id])")
+  println("        -> Processing article $(article[:article][:_id])")
   article = article[:article]
   yaml = getYamlFromMarkdown(article[:workingVersion][:md]) |> string2symbol
   yamltitle = markdowntoplain(yaml[:title])
@@ -84,6 +84,7 @@ function standardizearticle(article::Dict, corpusinfo::Dict)
 end
 
 function processbibliography(articles::Vector)
+  println("Processing bibliography")
   article = filter(a -> a[:title] == "__bibliographie", articles)
   if length(article) != 0
     bibliography = standardizearticle(Dict(:article => article[1]), Dict(:name => "", :path => ""))
