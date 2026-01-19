@@ -27,6 +27,7 @@ definepaths!()
 
 include("data.jl")  
 include("rendering.jl")
+include("deploy.jl")
 include("static.jl")
 
 export meta, corpuses, articles, workspace, definepaths!

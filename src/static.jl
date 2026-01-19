@@ -214,15 +214,3 @@ function staticsearchdata(outputdir::String)
     JSON.print(io, articles(), 2)
   end
 end
-
-"""
-    bake(outputdir::String="build"; baseurl::String="/")
-
-Convenient alias for generating a static site.
-
-* `outputdir`: Output directory path (default "build")
-* `baseurl`: Base URL for links (default "/")
-"""
-function bake(outputdir::String="build"; baseurl::String="/")
-  freeze(outputdir, baseurl=baseurl)
-end
