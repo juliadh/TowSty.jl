@@ -530,7 +530,7 @@ uuid = "868292e2-f7aa-4e91-a674-807902015840"
 version = "0.1.0"
 
 [[deps.TowStyTemplates]]
-git-tree-sha1 = "b7559a01b07adf2ad75f22476744476651be9697"
+git-tree-sha1 = "4c00dfa5c039c4c7baa38b6a4f6165a841b0750e"
 repo-rev = "main"
 repo-url = "git@gitlab.huma-num.fr:ceen/towsty/towstytemplates.jl.git"
 uuid = "26c3e8b2-b2ea-4c13-8a2d-a4d529bbbc89"

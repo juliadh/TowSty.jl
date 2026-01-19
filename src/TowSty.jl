@@ -20,10 +20,11 @@ DATA_PATH = ""
 BIB_PATH = ""
 CSL_PATH = ""
 
-definepaths!()
-
 include("utils.jl")
 include("apistylo.jl")
+
+definepaths!()
+
 include("data.jl")  
 include("rendering.jl")
 include("static.jl")
