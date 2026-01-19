@@ -17,7 +17,7 @@ function toaster(; port::Int=8888)
     @info "Loading webapp.jl from TowSty"
   end
 
-  webapp()
+  
   serve(port=port)
 end
 
