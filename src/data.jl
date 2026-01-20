@@ -66,7 +66,8 @@ function standardizearticle(article::Dict, corpusinfo::Dict)
   article = article[:article]
   yaml = getYamlFromMarkdown(article[:workingVersion][:md]) |> string2symbol
   yamltitle = markdowntoplain(yaml[:title])
-  yaml[:slug] = normalizelabel( yamltitle, slug=true )
+  #yaml[:slug] = normalizelabel( yamltitle, slug=true )
+  yaml[:slug] = URIs.escapeuri(yamltitle)
   #yaml[:path] = joinpath( corpusinfo[:path], normalizelabel( yamltitle, slug=true ) )
   yaml[:path] = joinpath( corpusinfo[:path], URIs.escapeuri(yamltitle) )
   yaml[:title] = markdowntohtml( yaml[:title] ) |> stripparagraph |> String
