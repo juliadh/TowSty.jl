@@ -1,51 +1,57 @@
-staticfiles("assets/static", "static")
+function route(path::String)
+  baseurl = get(() -> "/", () -> WEBAPP_BASEURL)
+  normalized_base = rstrip(baseurl, '/')
+  return normalized_base * path
+end
 
-@get "/" function()
+staticfiles("assets/static", route("/static"))
+
+@get route("/") function()
   data = gethome(WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
 
   return templaterender(templatepath, data)
 end
 
-@get "/data" function()
+@get route("/data") function()
   data = gethome(WEBAPP_BASEURL)
 
   return data
 end
 
-@get "/{corpus}" function (req::HTTP.Request, corpus::String)
+@get route("/{corpus}") function (req::HTTP.Request, corpus::String)
   data = getcorpus(corpus, WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "corpus.html")
 
   return templaterender(templatepath, data)
 end
 
-@get "/{corpus}/data" function (req::HTTP.Request, corpus::String)
+@get route("/{corpus}/data") function (req::HTTP.Request, corpus::String)
   data = getcorpus(corpus, WEBAPP_BASEURL)
 
   return data
 end
 
-@get "/{corpus}/{article}" function (req::HTTP.Request, corpus::String, article::String)
+@get route("/{corpus}/{article}") function (req::HTTP.Request, corpus::String, article::String)
   data = getarticle(corpus, article, WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)
 end
 
-@get "/{corpus}/{article}/data" function (req::HTTP.Request, corpus::String, article::String)
+@get route("/{corpus}/{article}/data") function (req::HTTP.Request, corpus::String, article::String)
   data = getarticle(corpus, article, WEBAPP_BASEURL)
 
   return data
 end
 
-@get "/articles.json" function()
+@get route("/articles.json") function()
   data = articles()
 
   return data
 end
 
-@get "/recherche" function()
+@get route("/recherche") function()
   metadata = meta()
   metadata[:baseurl] = WEBAPP_BASEURL
   data = Dict(:meta => metadata)
@@ -54,14 +60,14 @@ end
   return templaterender(templatepath, data)
 end
 
-@get "/bibliographie" function()
+@get route("/bibliographie") function()
   data = getbibliography(WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)
 end
 
-@get "/workspace" function (req::HTTP.Request)
+@get route("/workspace") function (req::HTTP.Request)
   templatepath = joinpath(TEMPLATES_PATH, "workspace.html")
   template = read(templatepath, String)
   render = otera(template)
@@ -70,7 +76,7 @@ end
   return Base.invokelatest(render, data)
 end
 
-@get "/workspace/update" function (req::HTTP.Request)
+@get route("/workspace/update") function (req::HTTP.Request)
   form = queryparams(req)
   styloapikey = get(form, "styloapikey", "")
   workspaceid = get(form, "workspaceid", "")
@@ -96,7 +102,7 @@ end
       <body>
         <header style="margin: auto; padding: 2em;">
           <nav>
-            <a href="/">Retour à l'accueil</a>
+            <a href="$(route("/"))">Retour à l'accueil</a>
           </nav>
         </header>
         <main style="width: 800px; margin: auto; padding: 2em;">
