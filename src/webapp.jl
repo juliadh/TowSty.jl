@@ -1,6 +1,5 @@
 function route(path::String)
-  baseurl = get(() -> "/", () -> WEBAPP_BASEURL)
-  normalized_base = rstrip(baseurl, '/')
+  normalized_base = rstrip(WEBAPP_BASEURL, '/')
   return normalized_base * path
 end
 
