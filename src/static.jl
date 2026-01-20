@@ -8,39 +8,40 @@ Wrapper function to generate a complete static site in `outputdir` from workspac
 """
 function freeze(outputdir::String; baseurl::String="/")
   println("Generating static site in: $outputdir")
+  println("Base URL: $baseurl")
 
   # Create the output directory
   mkpath(outputdir)
 
   # Copy static assets
   println("Copying static assets...")
-  copyassets(outputdir)
+  copyassets(outputdir, baseurl)
 
   # Generate the home page
   println("Generating the home page...")
-  statichomepage(outputdir)
+  statichomepage(outputdir, baseurl)
 
   # Generate corpus pages
   println("Generating corpus pages...")
   for corpus in corpuses()
-    staticcorpuspage(outputdir, corpus)
+    staticcorpuspage(outputdir, corpus, baseurl)
   end
 
   # Generate article pages
   println("Generating article pages...")
   for article in articles()
-    staticarticlepage(outputdir, article)
+    staticarticlepage(outputdir, article, baseurl)
   end
 
   # Generate bibliography page if it exists
   if !isnothing(generalbibliography())
     println("Generating bibliography page...")
-    staticbibliographypage(outputdir)
+    staticbibliographypage(outputdir, baseurl)
   end
 
   # Generate search page and search data JSON
   println("Generating search page and data...")
-  staticsearchpage(outputdir)
+  staticsearchpage(outputdir, baseurl)
   staticsearchdata(outputdir)
 
   println("Static site generated successfully!")
@@ -49,13 +50,14 @@ function freeze(outputdir::String; baseurl::String="/")
 end
 
 """
-    copyassets(outputdir::String)
+    copyassets(outputdir::String, baseurl::String="/")
 
 Copy static assets (CSS, JS, images) to the output directory.
 
 * `outputdir`: Output directory path
+* `baseurl`: Base URL for links (default "/")
 """
-function copyassets(outputdir::String)
+function copyassets(outputdir::String, baseurl::String="/")
   assetssrc = joinpath(pwd(), "assets/static")
   assetsdest = joinpath(outputdir, "static")
 
@@ -68,14 +70,15 @@ function copyassets(outputdir::String)
 end
 
 """
-    statichomepage(outputdir::String)
+    statichomepage(outputdir::String, baseurl::String="/")
 
 Generate the home page (index.html).
 
 * `outputdir`: Output directory path
+* `baseurl`: Base URL for links (default "/")
 """
-function statichomepage(outputdir::String)
-  data = gethome()
+function statichomepage(outputdir::String, baseurl::String="/")
+  data = gethome(baseurl)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
   html = templaterender_static(templatepath, data)
   filepath = joinpath(outputdir, "index.html")
@@ -84,16 +87,17 @@ function statichomepage(outputdir::String)
 end
 
 """
-    staticcorpuspage(outputdir::String, corpus::Dict)
+    staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="/")
 
 Generate a corpus page.
 
 * `outputdir`: Output directory path
 * `corpus`: Corpus data dictionary
+* `baseurl`: Base URL for links (default "/")
 """
-function staticcorpuspage(outputdir::String, corpus::Dict)
+function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="/")
   corpusname = corpus[:path]
-  data = getcorpus(corpusname)
+  data = getcorpus(corpusname, baseurl)
 
   if get(data, :error, false)
     @warn "Unable to generate page for corpus: $corpusname"
@@ -112,14 +116,15 @@ function staticcorpuspage(outputdir::String, corpus::Dict)
 end
 
 """
-    staticarticlepage(outputdir::String, article::Dict)
+    staticarticlepage(outputdir::String, article::Dict, baseurl::String="/")
 
 Generate an article page.
 
 * `outputdir`: Output directory path
 * `article`: Article data dictionary
+* `baseurl`: Base URL for links (default "/")
 """
-function staticarticlepage(outputdir::String, article::Dict)
+function staticarticlepage(outputdir::String, article::Dict, baseurl::String="/")
   path = article[:path]
   pathparts = splitpath(path)
   
@@ -131,7 +136,7 @@ function staticarticlepage(outputdir::String, article::Dict)
   corpusname = pathparts[1]
   articlepath = pathparts[2]
 
-  data = getarticle(corpusname, articlepath)
+  data = getarticle(corpusname, articlepath, baseurl)
 
   if get(data, :error, false)
     @warn "Unable to generate page for article: $path"
@@ -151,14 +156,15 @@ function staticarticlepage(outputdir::String, article::Dict)
 end
 
 """
-    staticbibliographypage(outputdir::String)
+    staticbibliographypage(outputdir::String, baseurl::String="/")
 
 Generate the bibliography page.
 
 * `outputdir`: Output directory path
+* `baseurl`: Base URL for links (default "/")
 """
-function staticbibliographypage(outputdir::String)
-  data = getbibliography()
+function staticbibliographypage(outputdir::String, baseurl::String="/")
+  data = getbibliography(baseurl)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
   html = templaterender_static(templatepath, data)
 
@@ -171,15 +177,19 @@ function staticbibliographypage(outputdir::String)
 end
 
 """
-    staticsearchpage(outputdir::String)
+    staticsearchpage(outputdir::String, baseurl::String="/")
 
 Generate the search page.
 
 * `outputdir`: Output directory path
+* `baseurl`: Base URL for links (default "/")
 """
-function staticsearchpage(outputdir::String)
+function staticsearchpage(outputdir::String, baseurl::String="/")
+  metadata = meta()
+  metadata[:baseurl] = baseurl
+  
   data = Dict(
-    :meta => meta()
+    :meta => metadata
   )
   
   templatepath = joinpath(TEMPLATES_PATH, "recherche.html")

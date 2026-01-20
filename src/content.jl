@@ -1,15 +1,20 @@
 """
-    gethome()
+    gethome(baseurl::String="/")
 
 Get data for the home page.
 Retrieves all corpuses available in the system.
+
+* `baseurl`: Base URL for links (default "/")
 """
-function gethome()
+function gethome(baseurl::String="/")
   narticles = length(articles())
   news = narticles >= 5 ? articles()[1:5] : articles()
 
+  metadata = meta()
+  metadata[:baseurl] = baseurl
+
   data = Dict(
-    :meta => meta(),
+    :meta => metadata,
     :content => Dict(
       :news => news,
       :orphans => orphans(),
@@ -21,23 +26,28 @@ function gethome()
 end
 
 """
-    getcorpus(corpusname::String)
+    getcorpus(corpusname::String, baseurl::String="/")
 
 Get data for a specific corpus page.
 Retrieves corpus information and associated articles. If the corpus is not found,
 returns an error structure.
 
 * `corpusname::String`: Normalized name of the corpus
+* `baseurl`: Base URL for links (default "/")
 """
-function getcorpus(corpusname::String)
+function getcorpus(corpusname::String, baseurl::String="/")
   allcorpuses = corpuses()
   matches = filter(c -> c[:path] == corpusname, allcorpuses)
   corpus = matches[1]
 
   if isempty(matches)
+    metadata = meta()
+    metadata[:baseurl] = baseurl
+    
     return Dict(
       :error => true,
       :message => "Corpus introuvable",
+      :meta => metadata,
       :workspacename => workspace()[:name],
       :corpuses => allcorpuses,
       :corpus => nothing,
@@ -46,6 +56,7 @@ function getcorpus(corpusname::String)
   end
 
   metadata = meta()
+  metadata[:baseurl] = baseurl
   metadata[:corpus] = Dict()
   metadata[:corpus][:path] = corpus[:path]
   metadata[:corpus][:name] = corpus[:name]
@@ -69,7 +80,7 @@ function getcorpus(corpusname::String)
 end
 
 """
-    getarticle(corpusname::String, article::String)
+    getarticle(corpusname::String, article::String, baseurl::String="/")
 
 Get data for a specific article.
 Retrieves and processes an article from a corpus, converting Markdown to HTML
@@ -77,17 +88,22 @@ with citations. If the article is not found, returns an error structure.
 
 * `corpusname::String`: Normalized name of the corpus
 * `article::String`: Article slug/identifier
+* `baseurl`: Base URL for links (default "/")
 """
-function getarticle(corpusname::String, article::String)
-  corpus = getcorpus(corpusname)
+function getarticle(corpusname::String, article::String, baseurl::String="/")
+  corpus = getcorpus(corpusname, baseurl)
 
   list = articles()
   articleidx = findfirst(a -> a[:path] == joinpath(corpusname, URIs.escapepath(article)), list)
 
   if articleidx === nothing
+    metadata = meta()
+    metadata[:baseurl] = baseurl
+    
     return Dict(
       :error => true,
       :message => "Article introuvable",
+      :meta => metadata,
       :corpuses => corpuses(),
       :content => Dict(:md => "", :bib => "")
     )
@@ -100,7 +116,7 @@ function getarticle(corpusname::String, article::String)
 
 
   data = Dict(
-    :meta => meta(),
+    :meta => metadata,
     :content => article
     #==:content => Dict(
       :id => article[:_id],
@@ -113,16 +129,22 @@ function getarticle(corpusname::String, article::String)
 end
 
 """
-    getbibliography()
+    getbibliography(baseurl::String="/")
 
 Get general bibliography
 Retrieves and processes the general bibliography, converting Markdown to HTML
 with citations.
+
+* `baseurl`: Base URL for links (default "/")
 """
-function getbibliography()
+function getbibliography(baseurl::String="/")
   bibliography = generalbibliography()
+  
+  metadata = meta()
+  metadata[:baseurl] = baseurl
+  
   data = Dict(
-    :meta => meta(),
+    :meta => metadata,
     :content => Dict(
       :id => bibliography[:_id],
       :title => bibliography[:title],

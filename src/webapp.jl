@@ -1,40 +1,40 @@
 staticfiles("assets/static", "static")
 
 @get "/" function()
-  data = gethome()
+  data = gethome(WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
 
   return templaterender(templatepath, data)
 end
 
 @get "/data" function()
-  data = gethome()
+  data = gethome(WEBAPP_BASEURL)
 
   return data
 end
 
 @get "/{corpus}" function (req::HTTP.Request, corpus::String)
-  data = getcorpus(corpus)
+  data = getcorpus(corpus, WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "corpus.html")
 
   return templaterender(templatepath, data)
 end
 
 @get "/{corpus}/data" function (req::HTTP.Request, corpus::String)
-  data = getcorpus(corpus)
+  data = getcorpus(corpus, WEBAPP_BASEURL)
 
   return data
 end
 
 @get "/{corpus}/{article}" function (req::HTTP.Request, corpus::String, article::String)
-  data = getarticle(corpus, article)
+  data = getarticle(corpus, article, WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)
 end
 
 @get "/{corpus}/{article}/data" function (req::HTTP.Request, corpus::String, article::String)
-  data = getarticle(corpus, article)
+  data = getarticle(corpus, article, WEBAPP_BASEURL)
 
   return data
 end
@@ -46,14 +46,16 @@ end
 end
 
 @get "/recherche" function()
-  data = gethome()
+  metadata = meta()
+  metadata[:baseurl] = WEBAPP_BASEURL
+  data = Dict(:meta => metadata)
   templatepath = joinpath(TEMPLATES_PATH, "recherche.html")
 
   return templaterender(templatepath, data)
 end
 
 @get "/bibliographie" function()
-  data = getbibliography()
+  data = getbibliography(WEBAPP_BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)
