@@ -82,7 +82,7 @@ function getarticle(corpusname::String, article::String)
   corpus = getcorpus(corpusname)
 
   list = articles()
-  articleidx = findfirst(a -> a[:path] == joinpath(corpusname, article), list)
+  articleidx = findfirst(a -> a[:path] == joinpath(corpusname, URIs.escapepath(article)), list)
 
   if articleidx === nothing
     return Dict(
