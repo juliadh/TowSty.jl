@@ -10,6 +10,7 @@ using Pandoc
 using JSON
 using YAML
 using Slugify
+using URIs
 using Unicode
 
 PROJECT_PATH = pwd()
