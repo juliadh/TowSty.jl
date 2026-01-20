@@ -1,45 +1,45 @@
 function route(path::String)
-  normalized_base = rstrip(WEBAPP_BASEURL, '/')
-  return normalized_base * path
+  normalizedbase = rstrip(BASEURL, '/')
+  return normalizedbase * path
 end
 
 staticfiles("assets/static", route("/static"))
 
 @get route("/") function()
-  data = gethome(WEBAPP_BASEURL)
+  data = gethome(BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
 
   return templaterender(templatepath, data)
 end
 
 @get route("/data") function()
-  data = gethome(WEBAPP_BASEURL)
+  data = gethome(BASEURL)
 
   return data
 end
 
 @get route("/{corpus}") function (req::HTTP.Request, corpus::String)
-  data = getcorpus(corpus, WEBAPP_BASEURL)
+  data = getcorpus(corpus, BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "corpus.html")
 
   return templaterender(templatepath, data)
 end
 
 @get route("/{corpus}/data") function (req::HTTP.Request, corpus::String)
-  data = getcorpus(corpus, WEBAPP_BASEURL)
+  data = getcorpus(corpus, BASEURL)
 
   return data
 end
 
 @get route("/{corpus}/{article}") function (req::HTTP.Request, corpus::String, article::String)
-  data = getarticle(corpus, article, WEBAPP_BASEURL)
+  data = getarticle(corpus, article, BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)
 end
 
 @get route("/{corpus}/{article}/data") function (req::HTTP.Request, corpus::String, article::String)
-  data = getarticle(corpus, article, WEBAPP_BASEURL)
+  data = getarticle(corpus, article, BASEURL)
 
   return data
 end
@@ -52,7 +52,7 @@ end
 
 @get route("/recherche") function()
   metadata = meta()
-  metadata[:baseurl] = WEBAPP_BASEURL
+  metadata[:baseurl] = BASEURL
   data = Dict(:meta => metadata)
   templatepath = joinpath(TEMPLATES_PATH, "recherche.html")
 
@@ -60,7 +60,7 @@ end
 end
 
 @get route("/bibliographie") function()
-  data = getbibliography(WEBAPP_BASEURL)
+  data = getbibliography(BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)

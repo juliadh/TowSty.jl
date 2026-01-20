@@ -3,9 +3,9 @@ function loadsources()
   return workspacedata
 end
 
-function standardizedata(workspace::Dict)
+function processdata(workspace::Dict)
   println("Processing data...")
-  corpuses = [standardizecorpus(corpus) for corpus in workspace[:corpus]]
+  corpuses = [processcorpus(corpus) for corpus in workspace[:corpus]]
 
   articles = Vector()
   for c in corpuses
@@ -16,8 +16,9 @@ function standardizedata(workspace::Dict)
   for article in articles
     push!(articleids, article[:_id])
   end
+
   orphans = filter(a -> !in(a[:_id], articleids) && a[:title] != "__bibliographie", workspace[:articles])
-  standardizedorphans = [standardizearticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans]
+  processorphans = [processarticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans]
 
   bibliography = processbibliography(workspace[:articles])
   #append!( articles, [bibliography] )
@@ -27,49 +28,49 @@ function standardizedata(workspace::Dict)
   return Dict(
     :workspace => workspace,
     :corpuses => corpuses,
-    :orphans => standardizedorphans,
+    :orphans => processorphans,
     :articles => sorted,
     :bibliography => !isnothing(bibliography) ? bibliography : nothing,
     :meta => Dict(
       :workspacename => workspace[:name],
       :nav => vcat(
-        [Dict(:name => c[:name], :path => URIs.escapepath(c[:path])) for c in corpuses],
+        [Dict(:name => c[:name], :path => formatpath(c[:path])) for c in corpuses],
         !isnothing(bibliography) ? [Dict(:name => "Bibliographie", :path => "bibliographie")] : []
       )
     )
   )
 end
 
-function standardizecorpus(corpus::Dict)
+function processcorpus(corpus::Dict)
   println("  -> Processing corpus: $(corpus[:name])")
   #corpus[:path] = normalizelabel(corpus[:name], slug=true)
-  corpus[:path] = URIs.escapepath(corpus[:name])
+  corpus[:path] = formatpath(corpus[:name])
   corpusinfo = Dict(
     :name => corpus[:name],
     :path => corpus[:path]
   )
-  corpus[:articles] = standardizearticles(corpus[:articles], corpusinfo)
+  corpus[:articles] = processarticles(corpus[:articles], corpusinfo)
   corpus[:description] = markdowntohtml(corpus[:description])
 
   return corpus
 end
 
-function standardizearticles(articles::Vector, corpusinfo::Dict)
+function processarticles(articles::Vector, corpusinfo::Dict)
   println("      -> Processing articles")
-  formatedarticles = [standardizearticle(article, corpusinfo) for article in articles]
+  formatedarticles = [processarticle(article, corpusinfo) for article in articles]
   sorted = sort(formatedarticles, by = x -> x[:createdAt], rev=true)
   return sorted
 end
 
-function standardizearticle(article::Dict, corpusinfo::Dict)
+function processarticle(article::Dict, corpusinfo::Dict)
   println("        -> Processing article $(article[:article][:_id])")
   article = article[:article]
   yaml = getYamlFromMarkdown(article[:workingVersion][:md]) |> string2symbol
   yamltitle = markdowntoplain(yaml[:title])
   #yaml[:slug] = normalizelabel( yamltitle, slug=true )
-  yaml[:slug] = URIs.escapepath(yamltitle)
+  yaml[:slug] = formatpath(yamltitle)
   #yaml[:path] = joinpath( corpusinfo[:path], normalizelabel( yamltitle, slug=true ) )
-  yaml[:path] = joinpath( corpusinfo[:path], URIs.escapepath(yamltitle) )
+  yaml[:path] = joinpath( corpusinfo[:path], formatpath(yamltitle) )
   yaml[:title] = markdowntohtml( yaml[:title] ) |> stripparagraph |> String
 
   merge!(article, yaml)
@@ -90,7 +91,7 @@ function processbibliography(articles::Vector)
   println("Processing bibliography")
   article = filter(a -> a[:title] == "__bibliographie", articles)
   if length(article) != 0
-    bibliography = standardizearticle(Dict(:article => article[1]), Dict(:name => "", :path => ""))
+    bibliography = processarticle(Dict(:article => article[1]), Dict(:name => "", :path => ""))
     return bibliography
   else
     return nothing
@@ -103,7 +104,7 @@ const DATA_CACHE = Ref{Dict}(Dict())
 function ensure_data_loaded()
   if isempty(DATA_CACHE[])
     sources = loadsources()
-    data = standardizedata(sources)
+    data = processdata(sources)
     DATA_CACHE[] = data
   end
   return DATA_CACHE[]

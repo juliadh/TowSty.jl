@@ -174,16 +174,16 @@ function getYamlFromMarkdown(markdown)
 end
 
 """
-    normalizelabel(label::String)
+    formatpath(label::String)
 
-This function normalize a label used for corpus or article path.
+This function normalize a path used for corpus or article path.
 """
-function normalizelabel(label::String; slug::Bool=false)
-  normalizedlabel = Unicode.normalize(label, stripmark=true) |> Unicode.lowercase
+function formatpath(label::String; slug::Bool=false)
+  formatedlabel = Unicode.normalize(label, stripmark=true) |> Unicode.lowercase |> URIs.escapepath
 
   if (slug)
-    return slugify(normalizedlabel)
+    return slugify(formatedlabel)
   else
-    return normalizedlabel
+    return formatedlabel
   end
 end

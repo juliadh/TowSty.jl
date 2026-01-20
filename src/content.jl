@@ -43,7 +43,7 @@ function getcorpus(corpusname::String, baseurl::String="/")
   if isempty(matches)
     metadata = meta()
     metadata[:baseurl] = baseurl
-    
+
     return Dict(
       :error => true,
       :message => "Corpus introuvable",
