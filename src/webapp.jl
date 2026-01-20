@@ -1,6 +1,8 @@
 function route(path::String)
   normalizedbase = rstrip(BASEURL, '/')
-  return normalizedbase * path
+  # baseurl should not start with /, so we add it
+  prefix = normalizedbase == "" ? "" : "/" * normalizedbase
+  return prefix * path
 end
 
 staticfiles("assets/static", route("/static"))

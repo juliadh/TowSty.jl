@@ -1,12 +1,12 @@
 """
-    gethome(baseurl::String="/")
+    gethome(baseurl::String="")
 
 Get data for the home page.
 Retrieves all corpuses available in the system.
 
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function gethome(baseurl::String="/")
+function gethome(baseurl::String="")
   narticles = length(articles())
   news = narticles >= 5 ? articles()[1:5] : articles()
 
@@ -26,16 +26,16 @@ function gethome(baseurl::String="/")
 end
 
 """
-    getcorpus(corpusname::String, baseurl::String="/")
+    getcorpus(corpusname::String, baseurl::String="")
 
 Get data for a specific corpus page.
 Retrieves corpus information and associated articles. If the corpus is not found,
 returns an error structure.
 
 * `corpusname::String`: Normalized name of the corpus
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function getcorpus(corpusname::String, baseurl::String="/")
+function getcorpus(corpusname::String, baseurl::String="")
   allcorpuses = corpuses()
   matches = filter(c -> c[:path] == corpusname, allcorpuses)
   corpus = matches[1]
@@ -80,7 +80,7 @@ function getcorpus(corpusname::String, baseurl::String="/")
 end
 
 """
-    getarticle(corpusname::String, article::String, baseurl::String="/")
+    getarticle(corpusname::String, article::String, baseurl::String="")
 
 Get data for a specific article.
 Retrieves and processes an article from a corpus, converting Markdown to HTML
@@ -88,9 +88,9 @@ with citations. If the article is not found, returns an error structure.
 
 * `corpusname::String`: Normalized name of the corpus
 * `article::String`: Article slug/identifier
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function getarticle(corpusname::String, article::String, baseurl::String="/")
+function getarticle(corpusname::String, article::String, baseurl::String="")
   corpus = getcorpus(corpusname, baseurl)
 
   list = articles()
@@ -129,15 +129,15 @@ function getarticle(corpusname::String, article::String, baseurl::String="/")
 end
 
 """
-    getbibliography(baseurl::String="/")
+    getbibliography(baseurl::String="")
 
 Get general bibliography
 Retrieves and processes the general bibliography, converting Markdown to HTML
 with citations.
 
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function getbibliography(baseurl::String="/")
+function getbibliography(baseurl::String="")
   bibliography = generalbibliography()
   
   metadata = meta()

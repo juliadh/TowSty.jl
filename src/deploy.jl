@@ -1,4 +1,4 @@
-function toaster(; port::Int=8888, baseurl::String="/")
+function toaster(; port::Int=8888, baseurl::String="")
   definepaths!()
 
   # Set global base URL for webapp
@@ -24,13 +24,13 @@ function toaster(; port::Int=8888, baseurl::String="/")
 end
 
 """
-    bake(outputdir::String="build"; baseurl::String="/")
+    bake(outputdir::String="build"; baseurl::String="")
 
 Convenient alias for generating a static site.
 
 * `outputdir`: Output directory path (default "build")
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
 """
-function bake(outputdir::String="build"; baseurl::String="/")
+function bake(outputdir::String="build"; baseurl::String="")
   freeze(outputdir, baseurl=baseurl)
 end

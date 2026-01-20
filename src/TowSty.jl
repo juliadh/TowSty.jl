@@ -21,7 +21,7 @@ TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
 DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
 BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
 CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
-BASEURL = "/"  # Default base URL for webapp
+BASEURL = ""  # Default base URL path without leading slash (e.g., "" for root, "blog" for /blog/)
 
 include("utils.jl")
 include("apistylo.jl")

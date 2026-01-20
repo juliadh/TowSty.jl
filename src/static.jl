@@ -1,12 +1,12 @@
 """
-    freeze(outputdir::String; baseurl::String="/")
+    freeze(outputdir::String; baseurl::String="")
 
 Wrapper function to generate a complete static site in `outputdir` from workspace data.
 
 * `outputdir`: Output directory path for the static site
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
 """
-function freeze(outputdir::String; baseurl::String="/")
+function freeze(outputdir::String; baseurl::String="")
   println("Generating static site in: $outputdir")
   println("Base URL: $baseurl")
 
@@ -50,14 +50,14 @@ function freeze(outputdir::String; baseurl::String="/")
 end
 
 """
-    copyassets(outputdir::String, baseurl::String="/")
+    copyassets(outputdir::String, baseurl::String="")
 
 Copy static assets (CSS, JS, images) to the output directory.
 
 * `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function copyassets(outputdir::String, baseurl::String="/")
+function copyassets(outputdir::String, baseurl::String="")
   assetssrc = joinpath(pwd(), "assets/static")
   assetsdest = joinpath(outputdir, "static")
 
@@ -70,14 +70,14 @@ function copyassets(outputdir::String, baseurl::String="/")
 end
 
 """
-    statichomepage(outputdir::String, baseurl::String="/")
+    statichomepage(outputdir::String, baseurl::String="")
 
 Generate the home page (index.html).
 
 * `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function statichomepage(outputdir::String, baseurl::String="/")
+function statichomepage(outputdir::String, baseurl::String="")
   data = gethome(baseurl)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
   html = templaterender_static(templatepath, data)
@@ -87,15 +87,15 @@ function statichomepage(outputdir::String, baseurl::String="/")
 end
 
 """
-    staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="/")
+    staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
 
 Generate a corpus page.
 
 * `outputdir`: Output directory path
 * `corpus`: Corpus data dictionary
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="/")
+function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
   corpusname = corpus[:path]
   data = getcorpus(corpusname, baseurl)
 
@@ -116,15 +116,15 @@ function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="/")
 end
 
 """
-    staticarticlepage(outputdir::String, article::Dict, baseurl::String="/")
+    staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
 
 Generate an article page.
 
 * `outputdir`: Output directory path
 * `article`: Article data dictionary
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function staticarticlepage(outputdir::String, article::Dict, baseurl::String="/")
+function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
   path = article[:path]
   pathparts = splitpath(path)
   
@@ -156,14 +156,14 @@ function staticarticlepage(outputdir::String, article::Dict, baseurl::String="/"
 end
 
 """
-    staticbibliographypage(outputdir::String, baseurl::String="/")
+    staticbibliographypage(outputdir::String, baseurl::String="")
 
 Generate the bibliography page.
 
 * `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function staticbibliographypage(outputdir::String, baseurl::String="/")
+function staticbibliographypage(outputdir::String, baseurl::String="")
   data = getbibliography(baseurl)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
   html = templaterender_static(templatepath, data)
@@ -177,14 +177,14 @@ function staticbibliographypage(outputdir::String, baseurl::String="/")
 end
 
 """
-    staticsearchpage(outputdir::String, baseurl::String="/")
+    staticsearchpage(outputdir::String, baseurl::String="")
 
 Generate the search page.
 
 * `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "/")
+* `baseurl`: Base URL for links (default "" for root deployment)
 """
-function staticsearchpage(outputdir::String, baseurl::String="/")
+function staticsearchpage(outputdir::String, baseurl::String="")
   metadata = meta()
   metadata[:baseurl] = baseurl
   

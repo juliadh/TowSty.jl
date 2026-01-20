@@ -43,7 +43,6 @@ end
 
 function processcorpus(corpus::Dict)
   println("  -> Processing corpus: $(corpus[:name])")
-  #corpus[:path] = normalizelabel(corpus[:name], slug=true)
   corpus[:path] = formatpath(corpus[:name])
   corpusinfo = Dict(
     :name => corpus[:name],
