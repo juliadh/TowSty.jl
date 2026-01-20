@@ -33,7 +33,7 @@ function standardizedata(workspace::Dict)
     :meta => Dict(
       :workspacename => workspace[:name],
       :nav => vcat(
-        [Dict(:name => c[:name], :path => URIs.escapeuri(c[:path])) for c in corpuses],
+        [Dict(:name => c[:name], :path => URIs.escapepath(c[:path])) for c in corpuses],
         !isnothing(bibliography) ? [Dict(:name => "Bibliographie", :path => "bibliographie")] : []
       )
     )
@@ -43,7 +43,7 @@ end
 function standardizecorpus(corpus::Dict)
   println("  -> Processing corpus: $(corpus[:name])")
   #corpus[:path] = normalizelabel(corpus[:name], slug=true)
-  corpus[:path] = URIs.escapeuri(corpus[:name])
+  corpus[:path] = URIs.escapepath(corpus[:name])
   corpusinfo = Dict(
     :name => corpus[:name],
     :path => corpus[:path]
@@ -67,9 +67,9 @@ function standardizearticle(article::Dict, corpusinfo::Dict)
   yaml = getYamlFromMarkdown(article[:workingVersion][:md]) |> string2symbol
   yamltitle = markdowntoplain(yaml[:title])
   #yaml[:slug] = normalizelabel( yamltitle, slug=true )
-  yaml[:slug] = URIs.escapeuri(yamltitle)
+  yaml[:slug] = URIs.escapepath(yamltitle)
   #yaml[:path] = joinpath( corpusinfo[:path], normalizelabel( yamltitle, slug=true ) )
-  yaml[:path] = joinpath( corpusinfo[:path], URIs.escapeuri(yamltitle) )
+  yaml[:path] = joinpath( corpusinfo[:path], URIs.escapepath(yamltitle) )
   yaml[:title] = markdowntohtml( yaml[:title] ) |> stripparagraph |> String
 
   merge!(article, yaml)
