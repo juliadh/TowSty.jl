@@ -179,6 +179,7 @@ end
 This function normalize a path used for corpus or article path.
 """
 function formatpath(label::String; slug::Bool=false)
+  label = replace(label, "?" => "", " " => "-", "«" => "", "»" => "")
   formatedlabel = Unicode.normalize(label, stripmark=true) |> Unicode.lowercase |> URIs.escapepath
 
   if (slug)
