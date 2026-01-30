@@ -31,6 +31,6 @@ include("render.jl")
 include("deploy.jl")
 include("static.jl")
 
-export meta, corpuses, articles, workspace, definepaths!
+export newproject, getworkspace, meta, corpuses, articles, workspace, definepaths!
 
 end
