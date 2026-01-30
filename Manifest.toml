@@ -91,9 +91,9 @@ uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.6.0"
 
 [[deps.EnumX]]
-git-tree-sha1 = "bddad79635af6aec424f53ed8aad5d7555dc6f00"
+git-tree-sha1 = "7bebc8aad6ee6217c78c5ddcf7ed289d65d0263e"
 uuid = "4e289a0a-7415-4d19-859d-a7e5c4648b56"
-version = "1.0.5"
+version = "1.0.6"
 
 [[deps.ExceptionUnwrapping]]
 deps = ["Test"]
@@ -183,9 +183,9 @@ version = "1.7.1"
 
 [[deps.JSON]]
 deps = ["Dates", "Logging", "Parsers", "PrecompileTools", "StructUtils", "UUIDs", "Unicode"]
-git-tree-sha1 = "5b6bb73f555bc753a6153deec3717b8904f5551c"
+git-tree-sha1 = "b3ad4a0255688dcb895a52fafbaae3023b588a90"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "1.3.0"
+version = "1.4.0"
 
     [deps.JSON.extensions]
     JSONArrowExt = ["ArrowTypes"]
@@ -209,6 +209,15 @@ version = "1.14.3"
 deps = ["StyledStrings"]
 uuid = "ac6e5ff7-fb65-4e79-a425-ec3bc9c03011"
 version = "1.12.0"
+
+[[deps.LRUCache]]
+git-tree-sha1 = "5519b95a490ff5fe629c4a7aa3b3dfc9160498b3"
+uuid = "8ac3fa9e-de4c-5943-b1dc-09c6b5f20637"
+version = "1.6.2"
+weakdeps = ["Serialization"]
+
+    [deps.LRUCache.extensions]
+    SerializationExt = ["Serialization"]
 
 [[deps.LazilyInitializedFields]]
 git-tree-sha1 = "0f2da712350b020bc3957f269c9caad516383ee0"
@@ -318,9 +327,9 @@ version = "10.2.1+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "NetworkOptions", "OpenSSL_jll", "Sockets"]
-git-tree-sha1 = "386b47442468acfb1add94bf2d85365dea10cbab"
+git-tree-sha1 = "1d1aaa7d449b58415f97d2839c318b70ffb525a0"
 uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
-version = "1.6.0"
+version = "1.6.1"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -339,10 +348,10 @@ uuid = "b2d7f28f-acd6-4007-8b26-bc27716e5513"
 version = "1.1.3"
 
 [[deps.Oxygen]]
-deps = ["DataStructures", "Dates", "HTTP", "JSON", "MIMEs", "Reexport", "RelocatableFolders", "Sockets", "Statistics", "StructTypes"]
-git-tree-sha1 = "6d433b065c87b79e3b67d665ff841164ccad2a92"
+deps = ["DataStructures", "Dates", "HTTP", "JSON", "LRUCache", "MIMEs", "Reexport", "RelocatableFolders", "Sockets", "Statistics", "StructTypes"]
+git-tree-sha1 = "b0a48def13f76870688eb450096e79fbecf914c2"
 uuid = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
-version = "1.8.0"
+version = "1.10.0"
 
     [deps.Oxygen.extensions]
     BonitoExt = "Bonito"
@@ -396,9 +405,9 @@ version = "1.3.3"
 
 [[deps.Preferences]]
 deps = ["TOML"]
-git-tree-sha1 = "0f27480397253da18fe2c12a4ba4eb9eb208bf3d"
+git-tree-sha1 = "522f093a29b31a93e34eaea17ba055d850edea28"
 uuid = "21216c6a-2e73-6563-6e65-726566657250"
-version = "1.5.0"
+version = "1.5.1"
 
 [[deps.Printf]]
 deps = ["Unicode"]
@@ -492,9 +501,9 @@ version = "1.11.0"
 
 [[deps.StructUtils]]
 deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "79529b493a44927dd5b13dde1c7ce957c2d049e4"
+git-tree-sha1 = "9297459be9e338e546f5c4bedb59b3b5674da7f1"
 uuid = "ec057cc2-7a8d-4b58-b3b3-92acb9f63b42"
-version = "2.6.0"
+version = "2.6.2"
 
     [deps.StructUtils.extensions]
     StructUtilsMeasurementsExt = ["Measurements"]
@@ -524,13 +533,14 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 version = "1.11.0"
 
 [[deps.TowSty]]
-deps = ["GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "Slugify", "URIs", "Unicode", "YAML"]
+deps = ["GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "Slugify", "TowStyTemplates", "URIs", "Unicode", "YAML"]
 path = "."
 uuid = "868292e2-f7aa-4e91-a674-807902015840"
 version = "0.1.0"
 
 [[deps.TowStyTemplates]]
-git-tree-sha1 = "3561420bfbac87a02ce6f204814b35e162cd59d9"
+deps = ["Random"]
+git-tree-sha1 = "8d81d050c205f13daf078a069843af9f9038bed0"
 repo-rev = "main"
 repo-url = "https://gitlab.huma-num.fr/ceen/towsty/towstytemplates.jl.git"
 uuid = "26c3e8b2-b2ea-4c13-8a2d-a4d529bbbc89"
