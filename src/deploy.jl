@@ -4,12 +4,12 @@ function toaster(; port::Int=8888, baseurl::String="")
   # Set global base URL for webapp
   global BASEURL = baseurl
 
-  if isfile(joinpath(PROJECT_PATH, "content.jl"))
-    include(joinpath(PROJECT_PATH, "content.jl"))
-    @info "Loading user-defined content.jl"
+  if isfile(joinpath(PROJECT_PATH, "model.jl"))
+    include(joinpath(PROJECT_PATH, "model.jl"))
+    @info "Loading user-defined model.jl"
   else
-    include(joinpath(@__DIR__, "content.jl"))
-    @info "Loading content.jl from TowSty"
+    include(joinpath(@__DIR__, "model.jl"))
+    @info "Loading model.jl from TowSty"
   end
 
   if isfile(joinpath(PROJECT_PATH, "webapp.jl"))

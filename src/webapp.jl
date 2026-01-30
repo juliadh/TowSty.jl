@@ -14,6 +14,8 @@ staticfiles("assets/static", route("/static"))
   return templaterender(templatepath, data)
 end
 
+
+# debug
 @get route("/data") function()
   data = gethome(BASEURL)
 

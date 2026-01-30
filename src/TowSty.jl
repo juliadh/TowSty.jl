@@ -26,8 +26,8 @@ BASEURL = ""  # Default base URL path without leading slash (e.g., "" for root, 
 include("utils.jl")
 include("apistylo.jl")
 
-include("data.jl")
-include("rendering.jl")
+include("processingdata.jl")
+include("render.jl")
 include("deploy.jl")
 include("static.jl")
 
