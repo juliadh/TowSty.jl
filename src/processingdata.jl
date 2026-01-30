@@ -25,6 +25,8 @@ function processdata(workspace::Dict)
 
   sorted = sort(articles, by = x -> x[:createdAt], rev=true)
 
+  workspace[:articles] = vcat(orphans, articles)
+
   return Dict(
     :workspace => workspace,
     :corpuses => corpuses,
