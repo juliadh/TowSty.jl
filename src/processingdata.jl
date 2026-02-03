@@ -59,8 +59,8 @@ end
 function processarticles(articles::Vector, corpusinfo::Dict)
   println("      -> Processing articles")
   formatedarticles = [processarticle(article, corpusinfo) for article in articles]
-  sorted = sort(formatedarticles, by = x -> x[:createdAt], rev=true)
-  return sorted
+  #sorted = sort(formatedarticles, by = x -> x[:createdAt], rev=true)
+  return formatedarticles
 end
 
 function processarticle(article::Dict, corpusinfo::Dict)
