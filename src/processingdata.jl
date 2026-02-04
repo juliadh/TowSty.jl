@@ -45,11 +45,12 @@ end
 
 function processcorpus(corpus::Dict)
   println("  -> Processing corpus: $(corpus[:name])")
-  corpus[:path] = formatpath(deepcopy(corpus[:name]))
   corpusinfo = Dict(
     :name => corpus[:name],
-    :path => corpus[:path]
+    :path => formatpath(corpus[:name])
   )
+
+  corpus[:path] = formatpath(corpus[:name])
   corpus[:articles] = processarticles(corpus[:articles], corpusinfo)
   corpus[:description] = markdowntohtml(corpus[:description])
 
