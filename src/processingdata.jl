@@ -45,7 +45,7 @@ end
 
 function processcorpus(corpus::Dict)
   println("  -> Processing corpus: $(corpus[:name])")
-  corpus[:path] = formatpath(corpus[:name])
+  corpus[:path] = formatpath(String(corpus[:name]))
   corpusinfo = Dict(
     :name => corpus[:name],
     :path => corpus[:path]
