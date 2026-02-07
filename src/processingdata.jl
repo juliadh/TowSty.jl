@@ -82,7 +82,7 @@ function processarticle(article::Dict, corpusinfo::Dict)
   article[:yaml] = article[:workingVersion][:yaml]
   article[:corpus] = corpusinfo
   article[:html] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntohtml
-  article[:plain] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntoplain
+  #article[:plain] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntoplain
 
   delete!(article, :workingVersion)
 
