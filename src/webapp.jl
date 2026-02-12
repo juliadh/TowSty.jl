@@ -85,17 +85,34 @@ end
   workspaceid = get(form, "workspaceid", "")
   hash = get(form, "hash", "")
 
-  data = getworkspace(workspaceid, styloapikey) |> string2symbol
-
-  if !isnothing(data) && haskey(data, :name)
+  # Verify hash
+  if !verifyhash(hash)
     message = Dict(
-      :message => "Données mise à jour !"
+      :message => "Erreur : Hash invalide. Mise à jour refusée."
     )
-    write(DATA_PATH, JSON.json(data))
   else
-    message = Dict(
-      :message => "Erreur lors de la mise à jour des données !"
-    )
+    # Hash is valid, proceed with update
+    try
+      # Use backup=true for updates
+      data = getworkspace(workspaceid, styloapikey, backup=true) |> string2symbol
+
+      if !isnothing(data) && haskey(data, :name)
+        message = Dict(
+          :message => "Données mises à jour avec succès !"
+        )
+        reload_data!()
+      else
+        message = Dict(
+          :message => "Erreur lors de la mise à jour des données !"
+        )
+      end
+    catch e
+      # @todo, do we also need to reload data here ?
+      @error "Update failed" exception=e
+      message = Dict(
+        :message => "Erreur lors de la mise à jour des données ! $(e)"
+      )
+    end
   end
 
   template = """
@@ -117,6 +134,6 @@ end
     </html>
     """
   render = otera(template)
-  reload_data!()
+  # reload_data!()
   return Base.invokelatest(render, message)
 end
