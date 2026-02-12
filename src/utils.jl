@@ -1,4 +1,19 @@
 """
+    definepaths!()
+
+"""
+function definepaths!()
+  global PROJECT_PATH = pwd()
+  global ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
+  global TEMP_PATH = joinpath(PROJECT_PATH, "temp")
+  global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
+  global DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
+  global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
+  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
+  return nothing
+end
+
+"""
     generatehash()
 
 Generate a random hash for workspace authentication.
