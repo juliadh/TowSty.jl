@@ -88,8 +88,8 @@ end
   workspaceid = get(form, "workspaceid", "")
   hash = get(form, "hash", "")
 
-  # Verify hash
-  if !verifyhash(hash)
+  # check hash
+  if !checkhash(hash)
     message = Dict(
       :message => "Clé de vérification erronée. La mise à jour est annulée !"
     )
