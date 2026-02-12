@@ -1,17 +1,15 @@
 module TowSty
 
 using TowStyTemplates
-using Oxygen
-using Unicode
-using OteraEngine
 using HTTP
+using URIs
 using GraphQLClient
-using Pandoc
+using Oxygen
+using OteraEngine
+using Unicode
 using JSON
 using YAML
-using Slugify
-using URIs
-using Unicode
+using Pandoc
 
 PROJECT_PATH = pwd()
 @info "Project is at $(PROJECT_PATH)"
@@ -31,6 +29,6 @@ include("render.jl")
 include("deploy.jl")
 include("static.jl")
 
-export newproject, getworkspace, meta, corpuses, articles, workspace, definepaths!
+export newproject, templates, getworkspace, toaster, bake, meta, corpuses, articles, workspace, definepaths!
 
 end
