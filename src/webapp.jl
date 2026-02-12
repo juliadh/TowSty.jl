@@ -83,6 +83,7 @@ end
   form = queryparams(req)
   styloapikey = get(form, "styloapikey", "")
   workspaceid = get(form, "workspaceid", "")
+  hash = get(form, "hash", "")
 
   data = getworkspace(workspaceid, styloapikey) |> string2symbol
 

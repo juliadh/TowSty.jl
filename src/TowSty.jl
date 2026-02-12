@@ -29,6 +29,6 @@ include("render.jl")
 include("deploy.jl")
 include("static.jl")
 
-export newproject, templates, getworkspace, toaster, bake, meta, corpuses, articles, workspace, definepaths!
+export newproject, templates, generatehash, getworkspace, toaster, bake, meta, corpuses, articles, workspace
 
 end
