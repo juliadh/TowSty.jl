@@ -1,6 +1,7 @@
 """
     definepaths!()
 
+For TowStyTemplates.
 """
 function definepaths!()
   global PROJECT_PATH = pwd()
@@ -11,97 +12,6 @@ function definepaths!()
   global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
   global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
   return nothing
-end
-
-"""
-    generatehash()
-
-Generate a random hash for workspace authentication.
-Returns a 32-character hexadecimal string.
-"""
-function generatehash()
-  return bytes2hex(rand(UInt8, 16))
-end
-
-"""
-    savehash(hash::String)
-
-Save a hash to the .hash file at the project root.
-
-* `hash::String`: The hash string to save
-"""
-function savehash(hash::String)
-  hash_path = joinpath(PROJECT_PATH, ".hash")
-  write(hash_path, hash)
-  @info "Hash saved to .hash file"
-end
-
-"""
-    readhash()
-
-Read the hash from the .hash file at the project root.
-Returns the hash string, or nothing if the file doesn't exist.
-"""
-function readhash()
-  hash_path = joinpath(PROJECT_PATH, ".hash")
-  if isfile(hash_path)
-    return strip(read(hash_path, String))
-  end
-  return nothing
-end
-
-"""
-    verifyhash(provided_hash::String)
-
-Verify that the provided hash matches the stored hash.
-Returns true if they match, false otherwise.
-
-* `provided_hash::String`: The hash to verify
-"""
-function verifyhash(provided_hash::String)
-  stored_hash = readhash()
-  if isnothing(stored_hash)
-    @warn "No hash file found"
-    return false
-  end
-  return provided_hash == stored_hash
-end
-
-"""
-    backupworkspace()
-
-Create a backup of the current workspace.json file.
-Saves it as workspace.json.backup with a timestamp.
-Returns the backup file path.
-"""
-function backupworkspace()
-  if !isfile(DATA_PATH)
-    @info "No existing workspace.json to backup"
-    return nothing
-  end
-  
-  backup_path = DATA_PATH * ".backup"
-  cp(DATA_PATH, backup_path, force=true)
-  @info "Workspace backed up to $(backup_path)"
-  return backup_path
-end
-
-"""
-    restoreworkspace()
-
-Restore workspace.json from backup if it exists.
-Returns true if restore was successful, false otherwise.
-"""
-function restoreworkspace()
-  backup_path = DATA_PATH * ".backup"
-  if !isfile(backup_path)
-    @warn "No backup file found"
-    return false
-  end
-  
-  cp(backup_path, DATA_PATH, force=true)
-  @info "Workspace restored from backup"
-  return true
 end
 
 """
@@ -277,4 +187,73 @@ function formatpath(label::String; slug::Bool=false)
   else
     return formatedlabel
   end
+end
+
+
+"""
+    readhash()
+
+Read the hash from the .hash file at the project root.
+Returns the hash string, or nothing if the file doesn't exist.
+"""
+function readhash()
+  hashpath = joinpath(PROJECT_PATH, ".hash")
+  if isfile(hashpath)
+    return strip(read(hashpath, String))
+  end
+  return nothing
+end
+
+"""
+    checkhash(hashtocheck::String)
+
+Verify that the provided hash matches the stored hash.
+Returns true if they match, false otherwise.
+
+* `hashtocheck::String`: The hash to verify
+"""
+function checkhash(hashtocheck::String)
+  hash = readhash()
+  if isnothing(hash)
+    @warn "No hash file found"
+    return false
+  end
+  return hashtocheck == hash
+end
+
+"""
+    backupworkspace()
+
+Create a backup of the current workspace.json file.
+Saves it as workspace.json.backup with a timestamp.
+Returns the backup file path.
+"""
+function backupworkspace()
+  if !isfile(DATA_PATH)
+    @info "No existing workspace.json to backup"
+    return nothing
+  end
+
+  backuppath = DATA_PATH * ".bk"
+  cp(DATA_PATH, backuppath, force=true)
+  @info "Workspace backed up to $(backuppath)"
+  return backuppath
+end
+
+"""
+    restoreworkspace()
+
+Restore workspace.json from backup if it exists.
+Returns true if restore was successful, false otherwise.
+"""
+function restoreworkspace()
+  backuppath = DATA_PATH * ".bk"
+  if !isfile(backuppath)
+    @warn "No backup file found"
+    return false
+  end
+
+  cp(backuppath, DATA_PATH, force=true)
+  @info "Workspace restored from backup"
+  return true
 end

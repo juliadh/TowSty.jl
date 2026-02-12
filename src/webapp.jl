@@ -91,29 +91,50 @@ end
   # Verify hash
   if !verifyhash(hash)
     message = Dict(
-      :message => "Erreur : Hash invalide. Mise à jour refusée."
+      :message => "Clé de vérification erronée. La mise à jour est annulée !"
     )
   else
     # Hash is valid, proceed with update
     try
-      # Use backup=true for updates
-      data = getworkspace(workspaceid, styloapikey, backup=true) |> string2symbol
+      # Create backup before update
+      backupworkspace()
+      
+      # Fetch new workspace data
+      data = getworkspace(workspaceid, styloapikey, backup=false) |> string2symbol
 
-      if !isnothing(data) && haskey(data, :name)
-        message = Dict(
-          :message => "Données mises à jour avec succès !"
-        )
+      if isnothing(data) || !haskey(data, :name)
+        # Invalid data received
+        @warn "Invalid workspace data received"
+        restoreworkspace()
         reload_data!()
-      else
         message = Dict(
-          :message => "Erreur lors de la mise à jour des données !"
+          :message => "Une erreur s'est produite lors de la récupération des données. Les anciennes données ont été restaurées."
         )
+      else
+        # Try to process the new data
+        try
+          reload_data!()
+          message = Dict(
+            :message => "Données mises à jour avec succès !"
+          )
+        catch process_error
+          # Processing failed, restore backup
+          @error "Data processing failed" exception=process_error
+          restoreworkspace()
+          reload_data!()
+          message = Dict(
+            :message => "Erreur lors du traitement des données : $(process_error). La anciennes données ont été restaurées."
+          )
+        end
       end
     catch e
-      # @todo, do we also need to reload data here ?
+      # Fetch failed, try to restore
       @error "Update failed" exception=e
+      if restoreworkspace()
+        reload_data!()
+      end
       message = Dict(
-        :message => "Erreur lors de la mise à jour des données ! $(e)"
+        :message => "Erreur lors de la récupération des données : $(e). Les anciennes données ont été restaurées."
       )
     end
   end
