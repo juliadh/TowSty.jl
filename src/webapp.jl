@@ -74,7 +74,10 @@ end
   templatepath = joinpath(TEMPLATES_PATH, "workspace.html")
   template = read(templatepath, String)
   render = otera(template)
-  data = Dict( :content => "" )
+  data = Dict(
+    :meta => meta(),
+    :content => ""
+  )
 
   return Base.invokelatest(render, data)
 end
