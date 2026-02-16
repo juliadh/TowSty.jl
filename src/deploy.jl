@@ -1,6 +1,10 @@
 function toaster(; port::Int=8888, baseurl::String="")
+
+  #definepaths!()
   # Set global base URL for webapp
   global BASEURL = baseurl
+  message = baseurl == "" ? "/" : baseurl
+  @info "Base url set at $(message)"
 
   if isfile(joinpath(PROJECT_PATH, "model.jl"))
     include(joinpath(PROJECT_PATH, "model.jl"))

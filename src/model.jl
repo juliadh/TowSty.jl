@@ -154,3 +154,21 @@ function getbibliography(baseurl::String="")
 
   return data
 end
+
+function searchindex()
+  indexedarticles = []
+  for article in articles()
+    a = Dict(
+      :_id => article[:_id],
+      :title => article[:title],
+      :corpus => article[:corpus],
+      :md => article[:md],
+      :path => article[:path]
+    )
+
+    push!(indexedarticles, a)
+  end
+
+  return indexedarticles
+end
+

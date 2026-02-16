@@ -49,7 +49,7 @@ end
 end
 
 @get route("/articles.json") function()
-  data = articles()
+  data = searchindex()
 
   return data
 end
