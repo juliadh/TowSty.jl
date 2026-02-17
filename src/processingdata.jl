@@ -28,25 +28,21 @@ A Dict with the following keys :
 - `:bibliography` - The general bibliography article
 - `:meta` - Workspace metadata including navigation
 """
-function processdata(workspace::Dict)
+function processdata(workspace::Dict{Symbol, Any})
   println("Processing data...")
   corpuses = [processcorpus(corpus) for corpus in workspace[:corpus]]
 
-  articles = Vector()
+  articles = Vector{Dict{Symbol, Any}}()
   for c in corpuses
     append!(articles, c[:articles])
   end
 
-  articleids = []
-  for article in articles
-    push!(articleids, article[:_id])
-  end
+  articleids = [article[:_id] for article in articles]
 
   orphans = filter(a -> !in(a[:_id], articleids) && a[:title] != "__bibliographie", workspace[:articles])
   processorphans = [processarticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans]
 
   bibliography = processbibliography(workspace[:articles])
-  #append!( articles, [bibliography] )
 
   sorted = sort(articles, by = x -> x[:createdAt], rev=true)
 
@@ -79,7 +75,7 @@ Wrapper to process the data from a corpus.
 # Return
 A processed corpus Dict
 """
-function processcorpus(corpus::Dict)
+function processcorpus(corpus::Dict{Symbol, Any})
   println("  -> Processing corpus: $(corpus[:name])")
   corpusinfo = Dict(
     :name => corpus[:name],
@@ -105,7 +101,7 @@ Process an array of articles from a corpus.
 # Return
 A Vector of formatted articles
 """
-function processarticles(articles::Vector, corpusinfo::Dict)
+function processarticles(articles::Vector{Dict{Symbol, Any}}, corpusinfo::Dict{Symbol, String})
   println("      -> Processing articles")
   formattedarticles = [processarticle(article, corpusinfo) for article in articles]
 
@@ -119,13 +115,13 @@ Process an article.
 Converts markdown content to html and processes metadata (yaml header, path, slug, etc.)
 
 # Arguments
-- `article::Dict`: a Dict with the m
+- `article::Dict`: a Dict containing the article.
 - `corpusinfo::Dict`: the `:name` and `:path` of the corpus.
 
 # Return
 A formatted article Dict
 """
-function processarticle(article::Dict, corpusinfo::Dict)
+function processarticle(article::Dict{Symbol, Any}, corpusinfo::Dict{Symbol, String})
   println("        -> Processing article $(article[:article][:_id])")
   article = article[:article]
   yaml = getyamlheader(article[:workingVersion][:md]) |> string2symbol
@@ -156,19 +152,17 @@ Retrieves the bibliography article and converts the markdown content to html
 and processes metadata (yaml header, path, slug, etc.)
 
 # Arguments
-- `articles::Vector`: a Dict with the m
+- `articles::Vector`: a Vector of articles from the workspace
 
 # Return
-A of formatted bibliography.
+A Dict containing the formatted bibliography article, or `nothing` if not found.
 """
-function processbibliography(articles::Vector)
+function processbibliography(articles::Vector{Dict{Symbol, Any}})
   println("Processing bibliography")
-  article = filter(a -> a[:title] == "__bibliographie", articles)
-  if length(article) != 0
-    bibliography = processarticle(Dict(:article => article[1]), Dict(:name => "", :path => ""))
+  bibindex = findfirst(a -> a[:title] == "__bibliographie", articles)
+  if !isnothing(bibindex)
+    bibliography = processarticle(Dict(:article => articles[bibindex]), Dict(:name => "", :path => ""))
     return bibliography
-  else
-    return nothing
   end
 end
 
