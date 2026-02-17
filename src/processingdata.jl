@@ -101,7 +101,7 @@ Process an array of articles from a corpus.
 # Return
 A Vector of formatted articles
 """
-function processarticles(articles::Vector{Dict{Symbol, Any}}, corpusinfo::Dict{Symbol, String})
+function processarticles(articles::Vector{Dict{Symbol, Dict{Symbol, Any}}}, corpusinfo::Dict{Symbol, String})
   println("      -> Processing articles")
   formattedarticles = [processarticle(article, corpusinfo) for article in articles]
 
@@ -121,14 +121,14 @@ Converts markdown content to html and processes metadata (yaml header, path, slu
 # Return
 A formatted article Dict
 """
-function processarticle(article::Dict{Symbol, Any}, corpusinfo::Dict{Symbol, String})
+function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Dict{Symbol, String})
   println("        -> Processing article $(article[:article][:_id])")
   article = article[:article]
   yaml = getyamlheader(article[:workingVersion][:md]) |> string2symbol
-  yamltitle = markdowntoplain(yaml[:title])
-  yaml[:slug] = formatpath(yamltitle)
-  yaml[:path] = joinpath( corpusinfo[:path], formatpath(yamltitle) )
-  yaml[:title] = markdowntohtml( yaml[:title] ) |> stripparagraph |> String
+  yamltitle = markdowntoplain(yaml[:title]) |> strip #strip to remove break (\n) at end of the string
+  yaml[:slug] = formatpath(String(yamltitle))
+  yaml[:path] = joinpath( corpusinfo[:path], formatpath(String(yamltitle)) )
+  yaml[:title] = markdowntohtml( yaml[:title] ) |> stripparagraph |> String |> strip
 
   merge!(article, yaml)
 
