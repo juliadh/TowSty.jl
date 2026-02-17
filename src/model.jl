@@ -4,6 +4,10 @@
 
 Get data for the home page.
 
+This function returns the data needed to build the home page.
+The 5 most recent articles are returned as news.
+Metadata, and all articles and orphans (article not associated with a corpus) are also returned.
+
 # Argument
 - `baseurl`: Base URL for links (default "" for root (`/`) deployment)
 
@@ -36,8 +40,10 @@ end
     getcorpus(corpusname::String, baseurl::String="")
 
 Get data for a specific corpus page.
-Retrieves corpus informations and associated articles. If the corpus is not found,
-returns an error message.
+
+This function returns the data needed for a given corpus page.
+A `:breadcrumb` is added to the `:meta` for navigation.
+In the `:content`, the corpus `:id`, `:name`, `:description` and the list of `:articles` are returned.
 
 # Arguments
 - `corpusname::String`: name of the corpus
@@ -97,8 +103,9 @@ end
     getarticle(corpusname::String, article::String, baseurl::String="")
 
 Get data for a specific article.
-Retrieves an article from a corpus.
-If the article is not found, returns an error message.
+
+This function returns the data for a given article (within a corpus) page.
+The corpus metadatas are fetched and the breadcrumb trail is enriched with the article informations.
 
 # Arguments
 - `corpusname::String`: name of the corpus
@@ -148,7 +155,8 @@ end
     getbibliography(baseurl::String="")
 
 Get general bibliography.
-Retrieves the general bibliography article.
+
+This function returns the data for the general bibliography page.
 
 # Argument
 - `baseurl`: Base URL for links (default "" for root deployment)
@@ -181,6 +189,10 @@ end
 
 Generate a search index for Lunr.
 
+This function builds a search index for all articles.
+For each article, it extracts the essential fields (`:_id`, `:title`, `:corpus`,
+markdown content (`:md`) and `:path`) needed for the Lunr search engine.
+
 # Return
 A `Dict()` with the following keys :
 - `:_id`
@@ -193,7 +205,7 @@ function searchindex()
   indexedarticles = []
   for article in articles()
     a = Dict(
-      :_id => article[:_id],
+      :_id => article[:_id],
       :title => article[:title],
       :corpus => article[:corpus],
       :md => article[:md],
