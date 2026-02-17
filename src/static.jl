@@ -3,7 +3,10 @@
 
 Wrapper function to generate a static site in `outputdir` from workspace data.
 
+# Argument
 - `outputdir`: Output directory path for the static site
+
+# Keyword argument
 - `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
 """
 function freeze(outputdir::String; baseurl::String="")
@@ -50,10 +53,11 @@ function freeze(outputdir::String; baseurl::String="")
 end
 
 """
-    copyassets(outputdir::String, baseurl::String="")
+    copyassets(outputdir::String)
 
 Copy static assets (CSS, JS, images) to the output directory.
 
+# Arguments
 - `outputdir`: Output directory path
 - `baseurl`: Base URL for links (default "" for root deployment)
 """
@@ -74,6 +78,7 @@ end
 
 Generate the home page (index.html).
 
+# Arguments
 - `outputdir`: Output directory path
 - `baseurl`: Base URL for links (default "" for root deployment)
 """
@@ -91,6 +96,7 @@ end
 
 Generate a corpus page.
 
+# Arguments
 - `outputdir`: Output directory path
 - `corpus`: Corpus data dictionary
 - `baseurl`: Base URL for links (default "" for root deployment)
@@ -120,6 +126,7 @@ end
 
 Generate an article page.
 
+# Arguments
 - `outputdir`: Output directory path
 - `article`: Article data dictionary
 - `baseurl`: Base URL for links (default "" for root deployment)
@@ -160,6 +167,7 @@ end
 
 Generate the bibliography page.
 
+# Arguments
 - `outputdir`: Output directory path
 - `baseurl`: Base URL for links (default "" for root deployment)
 """
@@ -181,6 +189,7 @@ end
 
 Generate the search page.
 
+# Arguments
 - `outputdir`: Output directory path
 - `baseurl`: Base URL for links (default "" for root deployment)
 """
@@ -214,6 +223,7 @@ end
 
 Generate the search data as a JSON.
 
+# Argument
 - `outputdir`: Output directory path
 """
 function staticsearchdata(outputdir::String)

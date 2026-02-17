@@ -3,7 +3,7 @@
 
 Deploy a TowSty webapp.
 
-# keyword arguments
+# Keyword arguments
 - `port`: The port used to serve the web application
 - `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
 """
@@ -39,7 +39,10 @@ end
 
 This function generates a static site from a Stylo workspace.
 
+# Argument
 - `outputdir`: Output directory path (default `"build"`)
+
+# Keyword argument
 - `baseurl`: Base URL path without leading slash (default "" for `root`, e.g., `"blog"` for `/blog/`)
 """
 function bake(outputdir::String="build"; baseurl::String="")

@@ -21,6 +21,7 @@ Process an article by converting its Markdown content to HTML with citations.
 Creates a temporary bibliography file, runs Pandoc with citeproc to process citations,
 and cleans up the temporary file. Uses CSL for citation formatting.
 
+# Argument
 - `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) keys
 """
 function markdowntohtml(article::Dict)
@@ -36,6 +37,7 @@ end
 
 Convert Markdown String to HTML.
 
+# Argument
 - `markdown::String`: Markdown formatted text
 """
 function markdowntohtml(markdown::String)
@@ -49,6 +51,7 @@ end
 
 Convert Markdown String to plain text.
 
+# Argument
 - `md::String`: Markdown formatted text
 """
 function markdowntoplain(md)
@@ -62,6 +65,7 @@ Process an article by converting its Markdown content to plain with citations.
 Creates a temporary bibliography file, runs Pandoc with citeproc to process citations,
 and cleans up the temporary file. Uses CSL for citation formatting.
 
+# Argument
 - `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) keys
 """
 function markdowntoplain(article::Dict)
@@ -78,6 +82,7 @@ end
 Remove YAML header from Markdown text.
 Strips the YAML header delimited by `---` at the beginning of the text.
 
+# Argument
 - `md::String`: Markdown text with YAML header
 """
 function stripyamlheader(md::String)
@@ -92,6 +97,7 @@ end
 Extract text content from a single HTML `<p/>` tag.
 Removes newlines, extracts content from `<p/>` tag, and returns the inner text.
 
+# Argument
 - `html::String`: HTML string containing a `<p/>` tag
 """
 function stripparagraph(html)
@@ -108,7 +114,8 @@ end
 Recursively convert dictionary string keys to symbols.
 Works on nested dictionaries and arrays, converting all string keys to symbols.
 
-- `data`: Data structure (Dict, Array, or primitive) to convert
+# Argument
+- `data`: Data structure (Dict, Array) to convert
 """
 function string2symbol(data)
   if isa(data, JSON.Object)
@@ -134,6 +141,7 @@ Extract and parse YAML header from a Markdown document.
 Reads YAML content between the opening and closing `---` delimiters at the
 beginning of the markdown document.
 
+# Argument
 - `markdown::String`: Markdown text with YAML header
 """
 function getyamlheader(markdown)
@@ -150,19 +158,28 @@ function getyamlheader(markdown)
 end
 
 """
-    formatpath(label::String; slug::Bool=false)
+    formatpath(label::String)
 
-This function formats a path.
+Format a label into a URL-safe path string.
+
+This function transforms a label into a clean, URL-safe string by:
+- Removing special characters (?, «, »)
+- Replacing spaces with hyphens
+- Normalizing Unicode characters and removing diacritical marks
+- Converting to lowercase
+- Escaping the result for URI usage
+
+# Argument
+- `label::String`: the string chain to format
+
+# Return
+A formatted, URL-safe string suitable for use in paths.
 """
-function formatpath(label::String; slug::Bool=false)
+function formatpath(label::String)
   label = replace(label, "?" => "", " " => "-", "«" => "", "»" => "")
   formatedlabel = Unicode.normalize(label, stripmark=true) |> Unicode.lowercase |> URIs.escapepath
 
-  if (slug)
-    return slugify(formatedlabel)
-  else
-    return formatedlabel
-  end
+  return formatedlabel
 end
 
 
@@ -187,7 +204,9 @@ Verify that the provided hash matches the stored hash.
 
 * `hashtocheck::String`: The hash to verify
 
-**Return** `true` if they match, `false` otherwise.
+# Return
+- `true` if match
+- `false` otherwise.
 """
 function checkhash(hashtocheck::String)
   hash = readhash()
@@ -203,7 +222,8 @@ end
 
 This function creates a backup of the current `workspace.json` file,
 and saves it as `workspace.json.bk`.
-Returns the backup file path.
+# Return
+The backup file path.
 """
 function backupworkspace()
   if !isfile(DATA_PATH)

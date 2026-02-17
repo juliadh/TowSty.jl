@@ -123,7 +123,7 @@ Converts markdown content to html and processes metadata (yaml header, path, slu
 - `corpusinfo::Dict`: the `:name` and `:path` of the corpus.
 
 # Return
-A of formatted article Dict
+A formatted article Dict
 """
 function processarticle(article::Dict, corpusinfo::Dict)
   println("        -> Processing article $(article[:article][:_id])")
