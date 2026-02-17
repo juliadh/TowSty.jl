@@ -1,7 +1,7 @@
 """
     definepaths!()
 
-For TowStyTemplates.
+Wrapper function to redefine all the project paths.
 """
 function definepaths!()
   global PROJECT_PATH = pwd()
@@ -21,7 +21,7 @@ Process an article by converting its Markdown content to HTML with citations.
 Creates a temporary bibliography file, runs Pandoc with citeproc to process citations,
 and cleans up the temporary file. Uses CSL for citation formatting.
 
-* `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) fields
+- `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) keys
 """
 function markdowntohtml(article::Dict)
   write(BIB_PATH, article[:bib])
@@ -34,9 +34,9 @@ end
 """
     markdowntohtml(markdown::String)
 
-Convert Markdown input to HTML.
+Convert Markdown String to HTML.
 
-* `markdown::String`: Markdown formatted text
+- `markdown::String`: Markdown formatted text
 """
 function markdowntohtml(markdown::String)
   html = run(Pandoc.Converter(input=markdown))
@@ -47,9 +47,9 @@ end
 """
     markdowntoplain(md::String)
 
-Convert Markdown input to plain text.
+Convert Markdown String to plain text.
 
-* `md::String`: Markdown formatted text
+- `md::String`: Markdown formatted text
 """
 function markdowntoplain(md)
   return run(Pandoc.Converter(input=md, from="markdown", to="plain"))
@@ -62,7 +62,7 @@ Process an article by converting its Markdown content to plain with citations.
 Creates a temporary bibliography file, runs Pandoc with citeproc to process citations,
 and cleans up the temporary file. Uses CSL for citation formatting.
 
-* `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) fields
+- `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) keys
 """
 function markdowntoplain(article::Dict)
   write(BIB_PATH, article[:bib])
@@ -72,58 +72,34 @@ function markdowntoplain(article::Dict)
   return markdown
 end
 
-
 """
     stripyamlheader(md::String)
 
-Remove YAML front matter from Markdown text.
+Remove YAML header from Markdown text.
 Strips the YAML header delimited by `---` at the beginning of the text.
 
-* `md::String`: Markdown text with YAML front matter
+- `md::String`: Markdown text with YAML header
 """
 function stripyamlheader(md::String)
   return replace(md, r"(?s)^---\n.*?\n---\n" => "")
 end
 
+
+# @rmq voir paramètre pandoc --wrap=none pour supprimer cette fonction
 """
     stripparagraph(html::String)
 
-Extract text content from a single HTML `<p/>`` tag.
+Extract text content from a single HTML `<p/>` tag.
 Removes newlines, extracts content from `<p/>` tag, and returns the inner text.
 
-* `html::String`: HTML string containing a `<p/>` tag
+- `html::String`: HTML string containing a `<p/>` tag
 """
 function stripparagraph(html)
   html = replace(chomp(html), "\n" => " ")
   p = match(r"<p>(.*?)</p>", html)
   content = p.captures[1]
-  
+
   return String(content)
-end
-
-"""
-    flattenDict(d::Dict, prefix_delim::String=".")
-
-Flatten a nested dictionary into a single-level dictionary with composite keys.
-Nested keys are joined using the delimiter (default: ".").
-
-* `d::Dict`: Dictionary to flatten
-* `prefix_delim::String`: Delimiter for joining nested keys (default: ".")
-"""
-function flattenDict(d, prefix_delim=".")
-  newDict = empty(d)
-  for (key, value) in pairs(d)
-    if isa(value, Dict)
-      flattenedValue = flattenDict(value, prefix_delim)
-      for (ikey, ivalue) in pairs(flattenedValue)
-        newDict["$key.$ikey"] = ivalue
-      end
-    else
-      newDict[key] = value
-    end
-  end
-  
-  return newDict
 end
 
 """
@@ -132,7 +108,7 @@ end
 Recursively convert dictionary string keys to symbols.
 Works on nested dictionaries and arrays, converting all string keys to symbols.
 
-* `data`: Data structure (Dict, Array, or primitive) to convert
+- `data`: Data structure (Dict, Array, or primitive) to convert
 """
 function string2symbol(data)
   if isa(data, JSON.Object)
@@ -152,15 +128,15 @@ function string2symbol(data)
 end
 
 """
-    getYamlFromMarkdown(markdown::String)
+    getyamlheader(markdown::String)
 
-Extract and parse YAML front matter from Markdown input.
+Extract and parse YAML header from a Markdown document.
 Reads YAML content between the opening and closing `---` delimiters at the
 beginning of the markdown document.
 
-* `markdown::String`: Markdown text with YAML front matter
+- `markdown::String`: Markdown text with YAML header
 """
-function getYamlFromMarkdown(markdown)
+function getyamlheader(markdown)
   lines = readlines(IOBuffer(markdown))
   if lines[1] == "---"
     yaml_lines = String[]
@@ -174,9 +150,9 @@ function getYamlFromMarkdown(markdown)
 end
 
 """
-    formatpath(label::String)
+    formatpath(label::String; slug::Bool=false)
 
-This function normalize a path used for corpus or article path.
+This function formats a path.
 """
 function formatpath(label::String; slug::Bool=false)
   label = replace(label, "?" => "", " " => "-", "«" => "", "»" => "")
@@ -193,7 +169,7 @@ end
 """
     readhash()
 
-Read the hash from the .hash file at the project root.
+Read the hash from the `.hash` file at the project root.
 Returns the hash string, or nothing if the file doesn't exist.
 """
 function readhash()
@@ -208,9 +184,10 @@ end
     checkhash(hashtocheck::String)
 
 Verify that the provided hash matches the stored hash.
-Returns true if they match, false otherwise.
 
 * `hashtocheck::String`: The hash to verify
+
+**Return** `true` if they match, `false` otherwise.
 """
 function checkhash(hashtocheck::String)
   hash = readhash()
@@ -224,8 +201,8 @@ end
 """
     backupworkspace()
 
-Create a backup of the current workspace.json file.
-Saves it as workspace.json.backup with a timestamp.
+This function creates a backup of the current `workspace.json` file,
+and saves it as `workspace.json.bk`.
 Returns the backup file path.
 """
 function backupworkspace()
@@ -243,8 +220,8 @@ end
 """
     restoreworkspace()
 
-Restore workspace.json from backup if it exists.
-Returns true if restore was successful, false otherwise.
+This function restores `workspace.json` from backup if it exists,
+and returns `true` if restoration was successful, `false` otherwise.
 """
 function restoreworkspace()
   backuppath = DATA_PATH * ".bk"

@@ -1,3 +1,12 @@
+"""
+    toaster(;port::Int=8888; baseurl::String="")
+
+Deploy a TowSty webapp.
+
+# keyword arguments
+- `port`: The port used to serve the web application
+- `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
+"""
 function toaster(; port::Int=8888, baseurl::String="")
 
   #definepaths!()
@@ -28,10 +37,10 @@ end
 """
     bake(outputdir::String="build"; baseurl::String="")
 
-Convenient alias for generating a static site.
+This function generates a static site from a Stylo workspace.
 
-* `outputdir`: Output directory path (default "build")
-* `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
+- `outputdir`: Output directory path (default `"build"`)
+- `baseurl`: Base URL path without leading slash (default "" for `root`, e.g., `"blog"` for `/blog/`)
 """
 function bake(outputdir::String="build"; baseurl::String="")
   freeze(outputdir, baseurl=baseurl)

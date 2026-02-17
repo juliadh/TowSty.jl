@@ -1,9 +1,13 @@
 """
-    styloclient(apikey::String) -> Client
+    styloclient(apikey::String)
 
-Create and return a GraphQL client configured for the Stylo API.
+Instantiate a GraphQL client.
 
-* `apikey::String`: The API key for authentication with Stylo
+# Argument
+- `apikey::String`: The API key for authentication with Stylo
+
+# Return
+A configured GraphQL client for the Stylo API.
 """
 function styloclient(apikey)
   endpoint = "https://stylo.huma-num.fr/graphql"
@@ -13,15 +17,20 @@ function styloclient(apikey)
 end
 
 """
-    getworkspace(id::String, apikey::String; backup::Bool=false) -> Dict
+    getworkspace(id::String, apikey::String; backup::Bool=false)
 
-Fetch a workspace from the Stylo API and save it to disk.
-If `backup` is true, creates a backup of the existing workspace.json before updating.
+Fetch a workspace from the Stylo API and writes it to `content/workspace.json`.
+If `backup` is true, creates a backup of the existing `workspace.json` before updating.
 
-* `id::String`: The workspace ID to retrieve
-* `apikey::String`: The API key for authentication
-* `backup::Bool`: Whether to create a backup before updating (default: false)
+# Arguments
+- `id::String`: The workspace id to fetch
+- `apikey::String`: The Stylo API key for authentication
 
+# Keyword argument
+- `backup::Bool`: Whether to create a backup before updating (default: false)
+
+# Return
+The workspace serialized as a Dict.
 ### Example
 
 ```julia

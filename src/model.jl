@@ -1,10 +1,16 @@
+# @rmq il ne faut pas trier les articles mais seulement les news => voir dans processingdata.jl
 """
     gethome(baseurl::String="")
 
 Get data for the home page.
-Retrieves all corpuses available in the system.
 
-* `baseurl`: Base URL for links (default "" for root deployment)
+# Argument
+- `baseurl`: Base URL for links (default "" for root (`/`) deployment)
+
+# Return
+A Dict with the following keys :
+- `:meta`
+- `:content`
 """
 function gethome(baseurl::String="")
   narticles = length(articles())
@@ -25,15 +31,22 @@ function gethome(baseurl::String="")
   return data
 end
 
+# @rmq revoir les messages d'erreur, s'aligner sur ce qui est attendu
 """
     getcorpus(corpusname::String, baseurl::String="")
 
 Get data for a specific corpus page.
-Retrieves corpus information and associated articles. If the corpus is not found,
-returns an error structure.
+Retrieves corpus informations and associated articles. If the corpus is not found,
+returns an error message.
 
-* `corpusname::String`: Normalized name of the corpus
-* `baseurl`: Base URL for links (default "" for root deployment)
+# Arguments
+- `corpusname::String`: name of the corpus
+- `baseurl`: Base URL for links (default "" for root deployment)
+
+# Return
+A `Dict()` with the following keys :
+- `:meta`
+- `:content`
 """
 function getcorpus(corpusname::String, baseurl::String="")
   allcorpuses = corpuses()
@@ -79,16 +92,23 @@ function getcorpus(corpusname::String, baseurl::String="")
   return data
 end
 
+# @rmq revoir les messages d'erreur, s'aligner sur ce qui est attendu
 """
     getarticle(corpusname::String, article::String, baseurl::String="")
 
 Get data for a specific article.
-Retrieves and processes an article from a corpus, converting Markdown to HTML
-with citations. If the article is not found, returns an error structure.
+Retrieves an article from a corpus.
+If the article is not found, returns an error message.
 
-* `corpusname::String`: Normalized name of the corpus
-* `article::String`: Article slug/identifier
-* `baseurl`: Base URL for links (default "" for root deployment)
+# Arguments
+- `corpusname::String`: name of the corpus
+- `article::String`: Article slug/identifier
+- `baseurl`: Base URL for links (default "" for root deployment)
+
+# Return
+A `Dict()` with the following keys :
+- `:meta`
+- `:content`
 """
 function getarticle(corpusname::String, article::String, baseurl::String="")
   corpus = getcorpus(corpusname, baseurl)
@@ -99,7 +119,7 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
   if articleidx === nothing
     metadata = meta()
     metadata[:baseurl] = baseurl
-    
+
     return Dict(
       :error => true,
       :message => "Article introuvable",
@@ -118,31 +138,32 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
   data = Dict(
     :meta => metadata,
     :content => article
-    #==:content => Dict(
-      :id => article[:_id],
-      :title => article[:title],
-      :article => article[:html]
-    )==#
   )
 
   return data
 end
 
+
 """
     getbibliography(baseurl::String="")
 
-Get general bibliography
-Retrieves and processes the general bibliography, converting Markdown to HTML
-with citations.
+Get general bibliography.
+Retrieves the general bibliography article.
 
-* `baseurl`: Base URL for links (default "" for root deployment)
+# Argument
+- `baseurl`: Base URL for links (default "" for root deployment)
+
+# Return
+A `Dict()` with the following keys :
+- `:meta`
+- `:content`
 """
 function getbibliography(baseurl::String="")
   bibliography = generalbibliography()
-  
+
   metadata = meta()
   metadata[:baseurl] = baseurl
-  
+
   data = Dict(
     :meta => metadata,
     :content => Dict(
@@ -155,11 +176,24 @@ function getbibliography(baseurl::String="")
   return data
 end
 
+"""
+    searchindex()
+
+Generate a search index for Lunr.
+
+# Return
+A `Dict()` with the following keys :
+- `:_id`
+- `:title`
+- `:corpus`
+- `:md`
+- `:path`
+"""
 function searchindex()
   indexedarticles = []
   for article in articles()
     a = Dict(
-      :_id => article[:_id],
+      :_id => article[:_id],
       :title => article[:title],
       :corpus => article[:corpus],
       :md => article[:md],

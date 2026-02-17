@@ -1,10 +1,10 @@
 """
     freeze(outputdir::String; baseurl::String="")
 
-Wrapper function to generate a complete static site in `outputdir` from workspace data.
+Wrapper function to generate a static site in `outputdir` from workspace data.
 
-* `outputdir`: Output directory path for the static site
-* `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
+- `outputdir`: Output directory path for the static site
+- `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
 """
 function freeze(outputdir::String; baseurl::String="")
   println("Generating static site in: $outputdir")
@@ -54,8 +54,8 @@ end
 
 Copy static assets (CSS, JS, images) to the output directory.
 
-* `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "" for root deployment)
+- `outputdir`: Output directory path
+- `baseurl`: Base URL for links (default "" for root deployment)
 """
 function copyassets(outputdir::String, baseurl::String="")
   assetssrc = joinpath(pwd(), "assets/static")
@@ -74,8 +74,8 @@ end
 
 Generate the home page (index.html).
 
-* `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "" for root deployment)
+- `outputdir`: Output directory path
+- `baseurl`: Base URL for links (default "" for root deployment)
 """
 function statichomepage(outputdir::String, baseurl::String="")
   data = gethome(baseurl)
@@ -91,9 +91,9 @@ end
 
 Generate a corpus page.
 
-* `outputdir`: Output directory path
-* `corpus`: Corpus data dictionary
-* `baseurl`: Base URL for links (default "" for root deployment)
+- `outputdir`: Output directory path
+- `corpus`: Corpus data dictionary
+- `baseurl`: Base URL for links (default "" for root deployment)
 """
 function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
   corpusname = corpus[:path]
@@ -120,9 +120,9 @@ end
 
 Generate an article page.
 
-* `outputdir`: Output directory path
-* `article`: Article data dictionary
-* `baseurl`: Base URL for links (default "" for root deployment)
+- `outputdir`: Output directory path
+- `article`: Article data dictionary
+- `baseurl`: Base URL for links (default "" for root deployment)
 """
 function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
   path = article[:path]
@@ -160,8 +160,8 @@ end
 
 Generate the bibliography page.
 
-* `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "" for root deployment)
+- `outputdir`: Output directory path
+- `baseurl`: Base URL for links (default "" for root deployment)
 """
 function staticbibliographypage(outputdir::String, baseurl::String="")
   data = getbibliography(baseurl)
@@ -181,24 +181,24 @@ end
 
 Generate the search page.
 
-* `outputdir`: Output directory path
-* `baseurl`: Base URL for links (default "" for root deployment)
+- `outputdir`: Output directory path
+- `baseurl`: Base URL for links (default "" for root deployment)
 """
 function staticsearchpage(outputdir::String, baseurl::String="")
   metadata = meta()
   metadata[:baseurl] = baseurl
-  
+
   data = Dict(
     :meta => metadata
   )
-  
+
   templatepath = joinpath(TEMPLATES_PATH, "recherche.html")
-  
+
   if !isfile(templatepath)
     @warn "Search template not found: $templatepath. Skipping search page generation."
     return
   end
-  
+
   html = templaterender_static(templatepath, data)
 
   # Create the search directory
@@ -214,13 +214,13 @@ end
 
 Generate the search data as a JSON.
 
-* `outputdir`: Output directory path
+- `outputdir`: Output directory path
 """
 function staticsearchdata(outputdir::String)
   # Write JSON file at the root of build directory
   jsonpath = joinpath(outputdir, "articles.json")
-  
+
   open(jsonpath, "w") do io
-    JSON.print(io, articles(), 2)
+    JSON.print(io, searchindex(), 2)
   end
 end
