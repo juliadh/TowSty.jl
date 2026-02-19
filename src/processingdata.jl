@@ -83,7 +83,7 @@ function processcorpus(corpus::Dict{Symbol, Any})
   )
 
   corpus[:path] = formatpath(corpus[:name])
-  corpus[:articles] = processarticles(corpus[:articles], corpusinfo)
+  corpus[:articles] = isempty(corpus[:articles]) ? [] : processarticles(corpus[:articles], corpusinfo)
   corpus[:description] = markdowntohtml(corpus[:description])
 
   return corpus
@@ -123,25 +123,41 @@ A formatted article Dict
 """
 function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Dict{Symbol, String})
   println("        -> Processing article $(article[:article][:_id])")
-  article = article[:article]
-  yaml = getyamlheader(article[:workingVersion][:md]) |> string2symbol
-  yamltitle = markdowntoplain(yaml[:title]) |> strip #strip to remove break (\n) at end of the string
-  yaml[:slug] = formatpath(String(yamltitle))
-  yaml[:path] = joinpath( corpusinfo[:path], formatpath(String(yamltitle)) )
-  yaml[:title] = markdowntohtml( yaml[:title] ) |> stripparagraph |> String |> strip
+  articledata = article[:article]
 
-  merge!(article, yaml)
+  yaml = getyamlheader(articledata[:workingVersion][:md])
+  yaml = isnothing(yaml) ? Dict() : string2symbol(yaml) # when no yaml header
 
-  article[:md] = article[:workingVersion][:md]
-  article[:bib] = article[:workingVersion][:bib]
-  article[:yaml] = article[:workingVersion][:yaml]
-  article[:corpus] = corpusinfo
-  article[:html] = Dict(:md => article[:workingVersion][:md], :bib => article[:workingVersion][:bib]) |> markdowntohtml
+  rawtitle = get(yaml, :title, articledata[:title]) # default title
 
-  delete!(article, :workingVersion)
+  html = Dict(:md => articledata[:workingVersion][:md], :bib => articledata[:workingVersion][:bib]) |> markdowntohtml
 
-  return article
+  meta = merge(Dict(pairs(articledata)...), Dict(pairs(yaml)...))
+  delete!(meta, :workingVersion)
+  delete!(meta, :title)
+
+  artobj = articulus(
+    rawtitle,
+    corpusinfo,
+    meta,
+    articledata[:workingVersion][:md],
+    html,
+    articledata[:workingVersion][:bib]
+  )
+
+  result = copy(artobj.meta)
+  result[:title] = artobj.title
+  result[:slug] = artobj.slug
+  result[:path] = artobj.path
+  result[:corpus] = artobj.corpus
+  result[:md] = artobj.md
+  result[:html] = artobj.html
+  result[:bib] = artobj.bib
+
+  return result
 end
+
+
 
 """
     processbibliography(articles::Vector)

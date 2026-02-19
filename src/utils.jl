@@ -135,25 +135,67 @@ function string2symbol(data)
 end
 
 """
+    validateyaml(parsed)
+
+Validate that parsed YAML data is a valid dictionary.
+Converts YAML.Constructor.SimpleOrderedDict to Dict if needed.
+
+# Argument
+- `parsed`: The result of YAML.load()
+
+# Return
+A Dict if valid, or `nothing` if invalid
+"""
+function validateyaml(parsed)
+  if isnothing(parsed)
+    return nothing
+  end
+
+  if isa(parsed, Dict)
+    return parsed
+  elseif isa(parsed, YAML.Constructor.SimpleOrderedDict)
+    return Dict(parsed)
+  else
+    @warn "YAML header is not a dictionary (got $(typeof(parsed))), ignoring it"
+    return nothing
+  end
+end
+
+"""
     getyamlheader(markdown::String)
 
 Extract and parse YAML header from a Markdown document.
 Reads YAML content between the opening and closing `---` delimiters at the
 beginning of the markdown document.
 
+Returns a Dict if the YAML is valid, or nothing if there's no YAML header or if parsing fails.
+
 # Argument
 - `markdown::String`: Markdown text with YAML header
 """
 function getyamlheader(markdown)
-  lines = readlines(IOBuffer(markdown))
-  if lines[1] == "---"
+  try
+    lines = readlines(IOBuffer(markdown))
+    if isempty(lines) || lines[1] != "---"
+      return nothing
+    end
+
     yaml_lines = String[]
     i = 2
     while i <= length(lines) && lines[i] != "---"
       push!(yaml_lines, lines[i])
       i += 1
     end
-    return YAML.load(join(yaml_lines, "\n"))
+
+    if isempty(yaml_lines)
+      return nothing
+    end
+
+    parsed = YAML.load(join(yaml_lines, "\n"))
+    return validateyaml(parsed)
+  catch e
+    @warn "Failed to parse YAML header: $(e)"
+    return nothing
   end
 end
 

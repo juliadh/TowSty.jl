@@ -42,6 +42,7 @@ function __init__()
 
 end
 
+include("types.jl")
 include("utils.jl")
 include("apistylo.jl")
 
