@@ -46,7 +46,7 @@ function processdata(workspace::Dict{Symbol, Any})
 
   sorted = sort(articles, by = x -> x[:createdAt], rev=true)
 
-  workspace[:articles] = vcat(orphans, articles)
+  workspace[:articles] = vcat(processorphans, articles)
 
   return Dict(
     :workspace => workspace,

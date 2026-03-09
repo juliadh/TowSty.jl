@@ -100,6 +100,55 @@ end
 
 # @rmq revoir les messages d'erreur, s'aligner sur ce qui est attendu
 """
+    getarticlebyid(articleid::String, baseurl::String="")
+
+Get data for a specific article.
+
+This function returns the data for a given article (by its id) page.
+
+# Arguments
+- `articleid::String`: Article identifier
+- `baseurl`: Base URL for links (default "" for root deployment)
+
+# Return
+A `Dict()` with the following keys :
+- `:meta`
+- `:content`
+"""
+function getarticlebyid(articleid::String, baseurl::String="")
+  articles = workspace()[:articles]
+
+  articleidx = findfirst(a -> a[:_id] == articleid, articles)
+
+  if articleidx === nothing
+    metadata = meta()
+    metadata[:baseurl] = baseurl
+
+    return Dict(
+      :error => true,
+      :message => "Article introuvable",
+      :meta => metadata,
+      :corpuses => corpuses(),
+      :content => Dict(:md => "", :bib => "")
+    )
+  end
+
+  article = articles[articleidx]
+  metadata = meta()
+  breadcrumb = Dict( :name => article[:title], :path => article[:path] )
+  metadata[:breadcrumb] = breadcrumb
+
+
+  data = Dict(
+    :meta => metadata,
+    :content => article
+  )
+
+  return data
+end
+
+# @rmq revoir les messages d'erreur, s'aligner sur ce qui est attendu
+"""
     getarticle(corpusname::String, article::String, baseurl::String="")
 
 Get data for a specific article.
@@ -149,7 +198,6 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
 
   return data
 end
-
 
 """
     getbibliography(baseurl::String="")
