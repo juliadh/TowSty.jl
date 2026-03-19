@@ -56,7 +56,6 @@ end
 
 @get route("/recherche") function()
   metadata = meta()
-  metadata[:baseurl] = BASEURL
   data = Dict(:meta => metadata)
   templatepath = joinpath(TEMPLATES_PATH, "recherche.html")
 
@@ -147,7 +146,7 @@ end
       <body>
         <header style="margin: auto; padding: 2em;">
           <nav>
-            <a href="$(route("/"))">Retour à l'accueil</a>
+            <a href="{{ homeurl }}">Retour à l'accueil</a>
           </nav>
         </header>
         <main style="width: 800px; margin: auto; padding: 2em;">
@@ -159,5 +158,6 @@ end
     """
   render = otera(template)
   # reload_data!()
+  message[:homeurl] = route("/")
   return Base.invokelatest(render, message)
 end

@@ -21,7 +21,6 @@ function gethome(baseurl::String="")
   news = narticles >= 5 ? articles()[1:5] : articles()
 
   metadata = meta()
-  metadata[:baseurl] = baseurl
 
   data = Dict(
     :meta => metadata,
@@ -61,7 +60,6 @@ function getcorpus(corpusname::String, baseurl::String="")
 
   if isempty(matches)
     metadata = meta()
-    metadata[:baseurl] = baseurl
 
     return Dict(
       :error => true,
@@ -75,7 +73,6 @@ function getcorpus(corpusname::String, baseurl::String="")
   end
 
   metadata = meta()
-  metadata[:baseurl] = baseurl
   metadata[:corpus] = Dict()
   metadata[:corpus][:path] = corpus[:path]
   metadata[:corpus][:name] = corpus[:name]
@@ -122,7 +119,6 @@ function getarticlebyid(articleid::String, baseurl::String="")
 
   if articleidx === nothing
     metadata = meta()
-    metadata[:baseurl] = baseurl
 
     return Dict(
       :error => true,
@@ -174,7 +170,6 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
 
   if articleidx === nothing
     metadata = meta()
-    metadata[:baseurl] = baseurl
 
     return Dict(
       :error => true,
@@ -218,7 +213,6 @@ function getbibliography(baseurl::String="")
   bibliography = generalbibliography()
 
   metadata = meta()
-  metadata[:baseurl] = baseurl
 
   data = Dict(
     :meta => metadata,

@@ -28,7 +28,7 @@ A Dict with the following keys :
 - `:bibliography` - The general bibliography article
 - `:meta` - Workspace metadata including navigation
 """
-function processdata(workspace::Dict{Symbol, Any})
+function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
   println("Processing data...")
   corpuses = [processcorpus(corpus) for corpus in workspace[:corpus]]
 
@@ -56,6 +56,7 @@ function processdata(workspace::Dict{Symbol, Any})
     :bibliography => !isnothing(bibliography) ? bibliography : nothing,
     :meta => Dict(
       :workspacename => workspace[:name],
+      :baseurl = baseurl,
       :nav => vcat(
         [Dict(:name => c[:name], :path => formatpath(c[:path])) for c in corpuses],
         !isnothing(bibliography) ? [Dict(:name => "Bibliographie", :path => "bibliographie")] : []
@@ -202,7 +203,7 @@ See [`processdata`](@ref).
 function ensure_data_loaded()
   if isempty(DATA_CACHE[])
     sources = loadsources()
-    data = processdata(sources)
+    data = processdata(sources, BASEURL)
     DATA_CACHE[] = data
   end
   return DATA_CACHE[]
