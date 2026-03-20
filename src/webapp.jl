@@ -14,7 +14,6 @@ staticfiles("assets/static", route("/static"))
   return templaterender(templatepath, data)
 end
 
-
 # debug
 @get route("/data") function()
   data = gethome(BASEURL)
@@ -22,16 +21,37 @@ end
   return data
 end
 
-@get route("/{corpus}") function (req::HTTP.Request, corpus::String)
-  data = getcorpus(corpus, BASEURL)
+@get route("/{slug}") function (req::HTTP.Request, slug::String)
+  # first check if it's a singlepage
+  pages = singlepages()
+  pageidx = findfirst(p -> p[:slug] == slug, pages)
+
+  if !isnothing(pageidx)
+    data = getsinglepage(slug, BASEURL)
+    templatepath = joinpath(TEMPLATES_PATH, "article.html")
+    
+    return templaterender(templatepath, data)
+  end
+
+  # otherwise, treat as a corpus
+  data = getcorpus(slug, BASEURL)
   templatepath = joinpath(TEMPLATES_PATH, "corpus.html")
 
   return templaterender(templatepath, data)
 end
 
-@get route("/{corpus}/data") function (req::HTTP.Request, corpus::String)
-  data = getcorpus(corpus, BASEURL)
+@get route("/{slug}/data") function (req::HTTP.Request, slug::String)
+  # first check if it's a singlepage
+  pages = singlepages()
+  pageidx = findfirst(p -> p[:slug] == slug, pages)
 
+  if !isnothing(pageidx)
+    data = getsinglepage(slug, BASEURL)
+    return data
+  end
+
+  # otherwise, treat as a corpus
+  data = getcorpus(slug, BASEURL)
   return data
 end
 
@@ -58,13 +78,6 @@ end
   metadata = meta()
   data = Dict(:meta => metadata)
   templatepath = joinpath(TEMPLATES_PATH, "recherche.html")
-
-  return templaterender(templatepath, data)
-end
-
-@get route("/bibliographie") function()
-  data = getbibliography(BASEURL)
-  templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)
 end

@@ -24,13 +24,13 @@ A Dict with the following keys :
 - `:workspace` - The complete workspace data
 - `:corpuses` - Processed corpus data
 - `:articles` - Sorted list of all articles
-- `:orphans` - Articles not associated with any corpus
-- `:bibliography` - The general bibliography article
+- `:orphans` - Articles not associated with any corpus (and not single pages)
+- `:singlepages` - Single pages (articles with title starting with `__`)
 - `:meta` - Workspace metadata including navigation
 """
 function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
   println("Processing data...")
-  corpuses = [processcorpus(corpus) for corpus in workspace[:corpus]]
+  corpuses = [processcorpus(corpus, baseurl) for corpus in workspace[:corpus]]
 
   articles = Vector{Dict{Symbol, Any}}()
   for c in corpuses
@@ -39,27 +39,35 @@ function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
 
   articleids = [article[:_id] for article in articles]
 
-  orphans = filter(a -> !in(a[:_id], articleids) && a[:title] != "__bibliographie", workspace[:articles])
-  processorphans = [processarticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans]
+  remainingarticles = filter(a -> !in(a[:_id], articleids), workspace[:articles])
+  
+  singlepages = filter(a -> startswith(a[:title], "__"), remainingarticles)
+  orphans = filter(a -> !startswith(a[:title], "__"), remainingarticles)
 
-  bibliography = processbibliography(workspace[:articles])
+  processedsingle = [processarticle(Dict(:article => s), Dict(:path => "", :name => "")) for s in singlepages]
+  processorphans = [processarticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans]
 
   sorted = sort(articles, by = x -> x[:createdAt], rev=true)
 
-  workspace[:articles] = vcat(processorphans, articles)
+  workspace[:articles] = vcat(processorphans, processedsingle, articles)
+
+  singlepagesnav = [
+    Dict(:name => s[:title], :path => s[:slug]) 
+    for s in processedsingle if s[:label] != "__index"
+  ]
 
   return Dict(
     :workspace => workspace,
     :corpuses => corpuses,
     :orphans => processorphans,
+    :singlepages => processedsingle,
     :articles => sorted,
-    :bibliography => !isnothing(bibliography) ? bibliography : nothing,
     :meta => Dict(
       :workspacename => workspace[:name],
-      :baseurl = baseurl,
+      :baseurl => baseurl,
       :nav => vcat(
         [Dict(:name => c[:name], :path => formatpath(c[:path])) for c in corpuses],
-        !isnothing(bibliography) ? [Dict(:name => "Bibliographie", :path => "bibliographie")] : []
+        singlepagesnav
       )
     )
   )
@@ -76,14 +84,14 @@ Wrapper to process the data from a corpus.
 # Return
 A processed corpus Dict
 """
-function processcorpus(corpus::Dict{Symbol, Any})
+function processcorpus(corpus::Dict{Symbol, Any}, baseurl::String)
   println("  -> Processing corpus: $(corpus[:name])")
   corpusinfo = Dict(
     :name => corpus[:name],
-    :path => formatpath(corpus[:name])
+    :path => joinpath(baseurl, formatpath(corpus[:name]) )
   )
 
-  corpus[:path] = formatpath(corpus[:name])
+  corpus[:path] = joinpath(baseurl, formatpath(corpus[:name]) )
   corpus[:articles] = isempty(corpus[:articles]) ? [] : processarticles(corpus[:articles], corpusinfo)
   corpus[:description] = markdowntohtml(corpus[:description])
 
@@ -129,7 +137,8 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
   yaml = getyamlheader(articledata[:workingVersion][:md])
   yaml = isnothing(yaml) ? Dict() : string2symbol(yaml) # when no yaml header
 
-  rawtitle = get(yaml, :title, articledata[:title]) # default title
+  label = articledata[:title]
+  rawtitle = get(yaml, :title, label)
 
   html = Dict(:md => articledata[:workingVersion][:md], :bib => articledata[:workingVersion][:bib]) |> markdowntohtml
 
@@ -139,6 +148,7 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
 
   artobj = articulus(
     rawtitle,
+    label,
     corpusinfo,
     meta,
     articledata[:workingVersion][:md],
@@ -148,6 +158,7 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
 
   result = copy(artobj.meta)
   result[:title] = artobj.title
+  result[:label] = artobj.label
   result[:slug] = artobj.slug
   result[:path] = artobj.path
   result[:corpus] = artobj.corpus
@@ -156,31 +167,6 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
   result[:bib] = artobj.bib
 
   return result
-end
-
-
-
-"""
-    processbibliography(articles::Vector)
-
-Process the main bibliography article.
-
-Retrieves the bibliography article and converts the markdown content to html 
-and processes metadata (yaml header, path, slug, etc.)
-
-# Arguments
-- `articles::Vector`: a Vector of articles from the workspace
-
-# Return
-A Dict containing the formatted bibliography article, or `nothing` if not found.
-"""
-function processbibliography(articles::Vector{Dict{Symbol, Any}})
-  println("Processing bibliography")
-  bibindex = findfirst(a -> a[:title] == "__bibliographie", articles)
-  if !isnothing(bibindex)
-    bibliography = processarticle(Dict(:article => articles[bibindex]), Dict(:name => "", :path => ""))
-    return bibliography
-  end
 end
 
 # Lazy-loaded cache to avoid IO at module load
@@ -286,9 +272,10 @@ end
 List all orphan articles.
 
 Orphan articles are those that exist in the workspace but are not associated
-with any corpus. Each orphan is processed with empty corpus information
+with any corpus and do not have a title starting with `__` (which would make them single pages).
+Each orphan is processed with empty corpus information.
 
-See also [`generalbibliography`](@ref).
+See also [`singlepages`](@ref).
 
 # Return
 A Vector of processed orphan article Dict objects
@@ -298,18 +285,21 @@ function orphans()
 end
 
 """
-    generalbibliography()
+    singlepages()
 
-Retrieve the general bibliography article.
+List all single pages.
 
-Returns the special bibliography article (identified by the Stylo title `__bibliographie`).
+Single pages are special articles identified by a title starting with `__`.
+They are not associated with any corpus but appear in the navigation menu.
+Examples include the bibliography article (`__bibliographie`) or other global pages.
+
+See also [`orphans`](@ref).
 
 # Return
-- A Dict representing the processed bibliography article.
-- `nothing` if no bibliography article is found in the workspace
+A Vector of processed single page Dict objects
 """
-function generalbibliography()
-  return ensure_data_loaded()[:bibliography]
+function singlepages()
+  return ensure_data_loaded()[:singlepages]
 end
 
 """

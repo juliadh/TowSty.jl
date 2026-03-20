@@ -10,6 +10,7 @@ Wrapper function to generate a static site in `outputdir` from workspace data.
 - `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
 """
 function freeze(outputdir::String; baseurl::String="")
+
   println("Generating static site in: $outputdir")
   println("Base URL: $baseurl")
 
@@ -26,20 +27,20 @@ function freeze(outputdir::String; baseurl::String="")
 
   # Generate corpus pages
   println("Generating corpus pages...")
-  for corpus in corpuses()
+  for corpus in Base.invokelatest(corpuses)
     staticcorpuspage(outputdir, corpus, baseurl)
   end
 
   # Generate article pages
   println("Generating article pages...")
-  for article in articles()
+  for article in Base.invokelatest(articles)
     staticarticlepage(outputdir, article, baseurl)
   end
 
-  # Generate bibliography page if it exists
-  if !isnothing(generalbibliography())
-    println("Generating bibliography page...")
-    staticbibliographypage(outputdir, baseurl)
+  # Generate single pages
+  println("Generating single pages...")
+  for page in Base.invokelatest(singlepages)
+    staticsinglepagepage(outputdir, page, baseurl)
   end
 
   # Generate search page and search data JSON
@@ -49,7 +50,7 @@ function freeze(outputdir::String; baseurl::String="")
 
   println("Static site generated successfully!")
   println("   → Directory: $outputdir")
-  println("   → Pages: $(length(corpuses())) corpus, $(length(articles())) articles")
+  println("   → Pages: $(length(Base.invokelatest(corpuses))) corpus, $(length(Base.invokelatest(articles))) articles")
 end
 
 """
@@ -83,7 +84,7 @@ Generate the home page (index.html).
 - `baseurl`: Base URL for links (default "" for root deployment)
 """
 function statichomepage(outputdir::String, baseurl::String="")
-  data = gethome(baseurl)
+  data = Base.invokelatest(gethome, baseurl)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
   html = templaterender_static(templatepath, data)
   filepath = joinpath(outputdir, "index.html")
@@ -103,7 +104,8 @@ Generate a corpus page.
 """
 function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
   corpusname = corpus[:path]
-  data = getcorpus(corpusname, baseurl)
+  
+  data = Base.invokelatest(getcorpus, corpusname, baseurl)
 
   if get(data, :error, false)
     @warn "Unable to generate page for corpus: $corpusname"
@@ -113,8 +115,9 @@ function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
   templatepath = joinpath(TEMPLATES_PATH, "corpus.html")
   html = templaterender_static(templatepath, data)
 
-  # Create the corpus directory
-  corpusdir = joinpath(outputdir, corpusname)
+  # Create the corpus directory using decoded path (for filesystem)
+  corpusname_decoded = URIs.unescapeuri(corpusname)
+  corpusdir = joinpath(outputdir, corpusname_decoded)
   mkpath(corpusdir)
 
   filepath = joinpath(corpusdir, "index.html")
@@ -143,7 +146,11 @@ function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
   corpusname = pathparts[1]
   articlepath = pathparts[2]
 
-  data = getarticle(corpusname, articlepath, baseurl)
+  # Decode paths: getarticle() expects decoded article (will re-encode for matching)
+  # but corpusname should stay encoded
+  articlepath_decoded = URIs.unescapeuri(articlepath)
+
+  data = Base.invokelatest(getarticle, corpusname, articlepath_decoded, baseurl)
 
   if get(data, :error, false)
     @warn "Unable to generate page for article: $path"
@@ -153,8 +160,9 @@ function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
   html = templaterender_static(templatepath, data)
 
-  # Create the article directory using the full path
-  articledir = joinpath(outputdir, path)
+  # Create the article directory using decoded paths (for filesystem)
+  corpusname_decoded = URIs.unescapeuri(corpusname)
+  articledir = joinpath(outputdir, corpusname_decoded, articlepath_decoded)
   mkpath(articledir)
 
   # Write the HTML file as index.html
@@ -163,24 +171,27 @@ function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
 end
 
 """
-    staticbibliographypage(outputdir::String, baseurl::String="")
+    staticsinglepagepage(outputdir::String, page::Dict, baseurl::String="")
 
-Generate the bibliography page.
+Generate a single page (article with title starting with `__`).
 
 # Arguments
 - `outputdir`: Output directory path
+- `page`: Single page Dict
 - `baseurl`: Base URL for links (default "" for root deployment)
 """
-function staticbibliographypage(outputdir::String, baseurl::String="")
-  data = getbibliography(baseurl)
+function staticsinglepagepage(outputdir::String, page::Dict, baseurl::String="")
+  slug_decoded = URIs.unescapeuri(page[:slug])
+  
+  data = Base.invokelatest(getsinglepage, page[:slug], baseurl)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
   html = templaterender_static(templatepath, data)
 
-  # Create the bibliography directory
-  bibliographydir = joinpath(outputdir, "bibliographie")
-  mkpath(bibliographydir)
+  # Create the page directory using decoded slug
+  pagedir = joinpath(outputdir, slug_decoded)
+  mkpath(pagedir)
 
-  filepath = joinpath(bibliographydir, "index.html")
+  filepath = joinpath(pagedir, "index.html")
   write(filepath, html)
 end
 
@@ -194,7 +205,7 @@ Generate the search page.
 - `baseurl`: Base URL for links (default "" for root deployment)
 """
 function staticsearchpage(outputdir::String, baseurl::String="")
-  metadata = meta()
+  metadata = Base.invokelatest(meta)
   metadata[:baseurl] = baseurl
 
   data = Dict(
@@ -231,6 +242,6 @@ function staticsearchdata(outputdir::String)
   jsonpath = joinpath(outputdir, "articles.json")
 
   open(jsonpath, "w") do io
-    JSON.print(io, searchindex(), 2)
+    JSON.print(io, Base.invokelatest(searchindex), 2)
   end
 end

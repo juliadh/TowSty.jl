@@ -5,6 +5,7 @@
 Get data for the home page.
 
 This function returns the data needed to build the home page.
+If a single page with slug `__index` exists, it is returned as `:indexpage` in the content.
 The 5 most recent articles are returned as news.
 Metadata, and all articles and orphans (article not associated with a corpus) are also returned.
 
@@ -12,9 +13,9 @@ Metadata, and all articles and orphans (article not associated with a corpus) ar
 - `baseurl`: Base URL for links (default "" for root (`/`) deployment)
 
 # Return
-A Dict with the following keys :
+A Dict with the following keys :
 - `:meta`
-- `:content`
+- `:content` (includes `:news`, `:orphans`, `:articles`, and optionally `:indexpage`)
 """
 function gethome(baseurl::String="")
   narticles = length(articles())
@@ -22,13 +23,23 @@ function gethome(baseurl::String="")
 
   metadata = meta()
 
+  # Check if an __index single page exists
+  pages = singlepages()
+  indexidx = findfirst(p -> p[:label] == "__index", pages)
+  
+  content = Dict(
+    :news => news,
+    :article => ""
+  )
+
+  if !isnothing(indexidx)
+    indexpage = pages[indexidx]
+    content[:article] = indexpage
+  end
+
   data = Dict(
     :meta => metadata,
-    :content => Dict(
-      :news => news,
-      :orphans => orphans(),
-      :articles => articles()
-    )
+    :content => content
   )
 
   return data
@@ -55,8 +66,8 @@ A `Dict()` with the following keys :
 """
 function getcorpus(corpusname::String, baseurl::String="")
   allcorpuses = corpuses()
-  matches = filter(c -> c[:path] == corpusname, allcorpuses)
-  corpus = matches[1]
+  corpuspath = joinpath(baseurl, corpusname)
+  matches = filter(c -> c[:path] == corpuspath, allcorpuses)
 
   if isempty(matches)
     metadata = meta()
@@ -71,6 +82,8 @@ function getcorpus(corpusname::String, baseurl::String="")
       :articles => []
     )
   end
+
+  corpus = matches[1]
 
   metadata = meta()
   metadata[:corpus] = Dict()
@@ -88,7 +101,7 @@ function getcorpus(corpusname::String, baseurl::String="")
       :id => corpus[:_id],
       :name => corpus[:name],
       :description => corpus[:description],
-      :articles => filter(a -> a[:corpus][:path] == corpusname, articles())
+      :articles => filter(a -> a[:corpus][:path] == corpuspath, articles())
     )
   )
 
@@ -166,7 +179,7 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
   corpus = getcorpus(corpusname, baseurl)
 
   list = articles()
-  articleidx = findfirst(a -> a[:path] == joinpath(corpusname, URIs.escapepath(article)), list)
+  articleidx = findfirst(a -> a[:path] == joinpath(baseurl, corpusname, URIs.escapepath(article)), list)
 
   if articleidx === nothing
     metadata = meta()
@@ -195,13 +208,15 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
 end
 
 """
-    getbibliography(baseurl::String="")
+    getsinglepage(slug::String, baseurl::String="")
 
-Get general bibliography.
+Get data for a single page by its slug.
 
-This function returns the data for the general bibliography page.
+Single pages are special articles identified by a title starting with `__`.
+They are not associated with any corpus but appear in the navigation menu.
 
-# Argument
+# Arguments
+- `slug::String`: Slug of the single page (e.g., "__bibliographie")
 - `baseurl`: Base URL for links (default "" for root deployment)
 
 # Return
@@ -209,18 +224,28 @@ A `Dict()` with the following keys :
 - `:meta`
 - `:content`
 """
-function getbibliography(baseurl::String="")
-  bibliography = generalbibliography()
+function getsinglepage(slug::String, baseurl::String="")
+  pages = singlepages()
+  pageidx = findfirst(p -> p[:slug] == slug, pages)
 
+  if pageidx === nothing
+    metadata = meta()
+
+    return Dict(
+      :error => true,
+      :message => "Page introuvable",
+      :meta => metadata,
+      :corpuses => corpuses(),
+      :content => Dict(:md => "", :bib => "")
+    )
+  end
+
+  page = pages[pageidx]
   metadata = meta()
 
   data = Dict(
     :meta => metadata,
-    :content => Dict(
-      :id => bibliography[:_id],
-      :title => bibliography[:title],
-      :html => bibliography[:html]
-    )
+    :content => page
   )
 
   return data
