@@ -146,6 +146,10 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
   delete!(meta, :workingVersion)
   delete!(meta, :title)
 
+  if(haskey(meta, :abstract))
+    meta[:abstract] =  markdowntohtml(meta[:abstract]) |> stripparagraph |> String
+  end
+
   artobj = articulus(
     rawtitle,
     label,
