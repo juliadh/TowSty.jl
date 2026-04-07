@@ -101,7 +101,8 @@ function getcorpus(corpusname::String, baseurl::String="")
       :id => corpus[:_id],
       :name => corpus[:name],
       :description => corpus[:description],
-      :articles => filter(a -> a[:corpus][:path] == corpuspath, articles())
+      :articles => corpus[:articles]
+      #:articles => filter(a -> a[:corpus][:path] == corpuspath, articles())
     )
   )
 
