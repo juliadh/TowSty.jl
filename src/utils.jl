@@ -296,3 +296,11 @@ function restoreworkspace()
   @info "Workspace restored from backup"
   return true
 end
+
+french_months = ["janvier", "février", "mars", "avril", "mai", "juin",
+                 "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
+
+function iso2fr(datestr::String)
+    d = Date(datestr, dateformat"yyyy-mm-dd")
+    return "$(day(d)) $(french_months[month(d)]) $(year(d))"
+end

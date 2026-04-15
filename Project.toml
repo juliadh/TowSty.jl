@@ -7,6 +7,7 @@ authors = ["Josselin Morvan <morvan.josselin@gmail.com>"]
 projects = ["docs"]
 
 [deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 GraphQLClient = "09d831e3-9c21-47a9-bfd8-076871817219"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
@@ -20,6 +21,7 @@ Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
+Dates = "1.11.0"
 GraphQLClient = "0.7.6"
 HTTP = "1.10.19"
 JSON = "1.3.0"

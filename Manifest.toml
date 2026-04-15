@@ -2,7 +2,7 @@
 
 julia_version = "1.12.0"
 manifest_format = "2.0"
-project_hash = "9765cf4d4edf87264b2d183c028c28a52decddeb"
+project_hash = "e13cc683ac22249abd19ac2518cfa946b64c8027"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -536,7 +536,7 @@ version = "1.11.0"
 deps = ["GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "Slugify", "TowStyTemplates", "URIs", "Unicode", "YAML"]
 path = "."
 uuid = "868292e2-f7aa-4e91-a674-807902015840"
-version = "0.1.0"
+version = "0.5.1"
 
 [[deps.TowStyTemplates]]
 deps = ["Random"]

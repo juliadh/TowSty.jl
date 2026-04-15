@@ -10,6 +10,7 @@ using Unicode
 using JSON
 using YAML
 using Pandoc
+using Dates
 
 function __init__()
   global PROJECT_PATH = pwd()
