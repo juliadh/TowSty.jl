@@ -195,6 +195,8 @@ function getyamlheader(markdown)
     return validateyaml(parsed)
   catch e
     @warn "Failed to parse YAML header: $(e)"
+    logmessage = "        [error] yaml"
+    push!(PROCESS_LOG[], logmessage)
     return nothing
   end
 end

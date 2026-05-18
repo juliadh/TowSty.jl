@@ -31,6 +31,7 @@ include("apistylo.jl")
 include("processingdata.jl")
 include("render.jl")
 include("static.jl")
+include("httperrors.jl")
 include("deploy.jl")
 
 export newproject, templates, generatehash, getworkspace, toaster, bake, meta, corpuses, articles, workspace, definepaths!

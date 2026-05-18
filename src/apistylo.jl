@@ -100,20 +100,18 @@ function getworkspace(workspaceid, apikey; backup::Bool=false)
     backupworkspace()
   end
 
-  try
-    response = GraphQLClient.execute( styloclient(apikey), query )
-    data = response.data["workspace"]
+  response = GraphQLClient.execute( styloclient(apikey), query )
+  data = response.data["workspace"]
+
+  if data != Nothing
     write(DATA_PATH, JSON.json(data))
     @info "Workspace data updated successfully"
     return data
-  catch e
-    @error "Failed to fetch or save workspace" exception=e
-    if backup
-      @warn "Attempting to restore from backup..."
-      if restoreworkspace()
-        @info "Workspace restored from backup"
-      end
+  else backup
+    @warn "Attempting to restore from backup..."
+    if restoreworkspace()
+      @info "Workspace restored from backup"
     end
-    rethrow(e)
   end
+
 end

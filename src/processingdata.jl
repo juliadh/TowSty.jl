@@ -29,7 +29,11 @@ A Dict with the following keys :
 - `:meta` - Workspace metadata including navigation
 """
 function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
-  println("Processing data...")
+  logmessage = "[workspace] $(workspace[:name])"
+  PROCESS_LOG[] = String[]
+  push!(PROCESS_LOG[], logmessage)
+  println(logmessage)
+
   corpuses = [processcorpus(corpus, baseurl) for corpus in workspace[:corpus]]
 
   articles = Vector{Dict{Symbol, Any}}()
@@ -44,8 +48,15 @@ function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
   singlepages = filter(a -> startswith(a[:title], "__"), remainingarticles)
   orphans = filter(a -> !startswith(a[:title], "__"), remainingarticles)
 
-  processedsingle = [processarticle(Dict(:article => s), Dict(:path => "", :name => "")) for s in singlepages]
-  processorphans = [processarticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans]
+  logmessage = "  [single pages]"
+  push!(PROCESS_LOG[], logmessage)
+  println(logmessage)
+  processedsingle = filter(!isnothing, [processarticle(Dict(:article => s), Dict(:path => "", :name => "")) for s in singlepages])
+  
+  logmessage = "  [orphans]"
+  push!(PROCESS_LOG[], logmessage)
+  println(logmessage)
+  processorphans = filter(!isnothing, [processarticle(Dict(:article => o), Dict(:path => "", :name => "")) for o in orphans])
 
   sorted = sort(articles, by = x -> x[:createdAt], rev=true)
 
@@ -85,7 +96,10 @@ Wrapper to process the data from a corpus.
 A processed corpus Dict
 """
 function processcorpus(corpus::Dict{Symbol, Any}, baseurl::String)
-  println("  -> Processing corpus: $(corpus[:name])")
+  logmessage = "  [corpus] $(corpus[:name])"
+  push!(PROCESS_LOG[], logmessage)
+  println(logmessage)
+
   corpusinfo = Dict(
     :name => corpus[:name],
     :path => joinpath(baseurl, formatpath(corpus[:name]) )
@@ -111,8 +125,11 @@ Process an array of articles from a corpus.
 A Vector of formatted articles
 """
 function processarticles(articles::Vector{Dict{Symbol, Dict{Symbol, Any}}}, corpusinfo::Dict{Symbol, String})
-  println("      -> Processing articles")
-  formattedarticles = [processarticle(article, corpusinfo) for article in articles]
+  logmessage = "    [articles] $(length(articles)) article(s)"
+  push!(PROCESS_LOG[], logmessage)
+  println(logmessage)
+
+  formattedarticles = filter(!isnothing, [processarticle(article, corpusinfo) for article in articles])
 
   return formattedarticles
 end
@@ -131,7 +148,10 @@ Converts markdown content to html and processes metadata (yaml header, path, slu
 A formatted article Dict
 """
 function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Dict{Symbol, String})
-  println("        -> Processing article $(article[:article][:_id])")
+  logmessage = "      [article] $(article[:article][:_id]) - $(article[:article][:title])"
+  push!(PROCESS_LOG[], logmessage)
+  println(logmessage)
+
   articledata = article[:article]
 
   yaml = getyamlheader(articledata[:workingVersion][:md])
@@ -140,7 +160,13 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
   label = articledata[:title]
   rawtitle = get(yaml, :title, label)
 
-  html = Dict(:md => articledata[:workingVersion][:md], :bib => articledata[:workingVersion][:bib]) |> markdowntohtml
+  html = try
+    Dict(:md => articledata[:workingVersion][:md], :bib => articledata[:workingVersion][:bib]) |> markdowntohtml
+  catch e
+    @warn "Erreur lors de la convertion Pandoc, l’article ($(articledata[:_id])) est ignoré" exception=e
+    push!(PROCESS_LOG[], "        [error] html")
+    return nothing
+  end
 
   meta = merge(Dict(pairs(articledata)...), Dict(pairs(yaml)...))
   delete!(meta, :workingVersion)
@@ -170,11 +196,17 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
   result[:html] = artobj.html
   result[:bib] = artobj.bib
 
+  push!(PROCESS_LOG[], "        [ok]")
   return result
 end
 
 # Lazy-loaded cache to avoid IO at module load
 const DATA_CACHE = Ref{Dict}(Dict())
+const PROCESS_LOG = Ref{Vector{String}}(String[])
+
+function processlog()
+  return PROCESS_LOG[]
+end
 
 """
     ensure_data_loaded()
@@ -195,6 +227,8 @@ function ensure_data_loaded()
     sources = loadsources()
     data = processdata(sources, BASEURL)
     DATA_CACHE[] = data
+    logpath = joinpath(TEMP_PATH, "process.log")
+    write(logpath, join(PROCESS_LOG[], "\n"))
   end
   return DATA_CACHE[]
 end

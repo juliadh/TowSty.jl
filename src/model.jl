@@ -74,12 +74,7 @@ function getcorpus(corpusname::String, baseurl::String="")
 
     return Dict(
       :error => true,
-      :message => "Corpus introuvable",
-      :meta => metadata,
-      :workspacename => workspace()[:name],
-      :corpuses => allcorpuses,
-      :corpus => nothing,
-      :articles => []
+      :message => "Corpus introuvable"
     )
   end
 
@@ -136,10 +131,7 @@ function getarticlebyid(articleid::String, baseurl::String="")
 
     return Dict(
       :error => true,
-      :message => "Article introuvable",
-      :meta => metadata,
-      :corpuses => corpuses(),
-      :content => Dict(:md => "", :bib => "")
+      :message => "Article introuvable"
     )
   end
 
@@ -187,10 +179,7 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
 
     return Dict(
       :error => true,
-      :message => "Article introuvable",
-      :meta => metadata,
-      :corpuses => corpuses(),
-      :content => Dict(:md => "", :bib => "")
+      :message => "Article introuvable"
     )
   end
 
@@ -234,10 +223,7 @@ function getsinglepage(slug::String, baseurl::String="")
 
     return Dict(
       :error => true,
-      :message => "Page introuvable",
-      :meta => metadata,
-      :corpuses => corpuses(),
-      :content => Dict(:md => "", :bib => "")
+      :message => "Page introuvable"
     )
   end
 

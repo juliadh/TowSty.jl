@@ -28,13 +28,14 @@ end
 
   if !isnothing(pageidx)
     data = getsinglepage(slug, BASEURL)
+    get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
     templatepath = joinpath(TEMPLATES_PATH, "article.html")
-    
     return templaterender(templatepath, data)
   end
 
   # otherwise, treat as a corpus
   data = getcorpus(slug, BASEURL)
+  get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
   templatepath = joinpath(TEMPLATES_PATH, "corpus.html")
 
   return templaterender(templatepath, data)
@@ -47,16 +48,19 @@ end
 
   if !isnothing(pageidx)
     data = getsinglepage(slug, BASEURL)
+    get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
     return data
   end
 
   # otherwise, treat as a corpus
   data = getcorpus(slug, BASEURL)
+  get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
   return data
 end
 
 @get route("/{corpus}/{article}") function (req::HTTP.Request, corpus::String, article::String)
   data = getarticle(corpus, article, BASEURL)
+  get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
   return templaterender(templatepath, data)
@@ -64,6 +68,7 @@ end
 
 @get route("/{corpus}/{article}/data") function (req::HTTP.Request, corpus::String, article::String)
   data = getarticle(corpus, article, BASEURL)
+  get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
 
   return data
 end
@@ -102,75 +107,49 @@ end
 
   # check hash
   if !checkhash(hash)
-    message = Dict(
-      :message => "Clé de vérification erronée. La mise à jour est annulée !"
-    )
+    message = Dict(:message => "Clé de vérification erronée. La mise à jour est annulée !")
   else
     # Hash is valid, proceed with update
     try
-      # Create backup before update
       backupworkspace()
-      
-      # Fetch new workspace data
+
       data = getworkspace(workspaceid, styloapikey, backup=false) |> string2symbol
 
-      if isnothing(data) || !haskey(data, :name)
-        # Invalid data received
+      if isnothing(data) || !haskey(data, :name) # Invalid data received
         @warn "Invalid workspace data received"
         restoreworkspace()
         reload_data!()
-        message = Dict(
-          :message => "Une erreur s'est produite lors de la récupération des données. Les anciennes données ont été restaurées."
-        )
+        message = Dict(:message => "Une erreur s'est produite lors de la récupération des données. Les anciennes données ont été restaurées.")
       else
-        # Try to process the new data
-        try
+        try # try to process the new data
           reload_data!()
           message = Dict(
-            :message => "Données mises à jour avec succès !"
+            :message => "Données mises à jour avec succès !",
+            :log => processlog()
           )
-        catch process_error
-          # Processing failed, restore backup
+        catch process_error # Processing failed, restore backup
           @error "Data processing failed" exception=process_error
           restoreworkspace()
           reload_data!()
-          message = Dict(
-            :message => "Erreur lors du traitement des données : $(process_error). La anciennes données ont été restaurées."
-          )
+          message = Dict(:message => "Erreur lors du traitement des données : $(process_error). La anciennes données ont été restaurées." )
         end
       end
-    catch e
-      # Fetch failed, try to restore
+    catch e # Fetch failed, try to restore
       @error "Update failed" exception=e
       if restoreworkspace()
         reload_data!()
       end
-      message = Dict(
-        :message => "Erreur lors de la récupération des données : $(e). Les anciennes données ont été restaurées."
-      )
+      message = Dict(:message => "Erreur lors de la récupération des données : $(e). Les anciennes données ont été restaurées.")
     end
   end
 
-  template = """
-    <html>
-      <head>
-        <meta charset="utf-8"/>
-      </head>
-      <body>
-        <header style="margin: auto; padding: 2em;">
-          <nav>
-            <a href="{{ homeurl }}">Retour à l'accueil</a>
-          </nav>
-        </header>
-        <main style="width: 800px; margin: auto; padding: 2em;">
-          <h1>Mise à jour des données</h1>
-          <p>{{ message }}</p>
-        </main>
-      </body>
-    </html>
-    """
+  templatepath = joinpath(TEMPLATES_PATH, "log.html")
+  template = read(templatepath, String)
   render = otera(template)
-  # reload_data!()
+  
   message[:homeurl] = route("/")
+  if !haskey(message, :log)
+    message[:log] = []
+  end
   return Base.invokelatest(render, message)
 end

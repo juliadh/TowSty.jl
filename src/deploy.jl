@@ -31,7 +31,7 @@ function toaster(; port::Int=8888, baseurl::String="")
     @info "Loading webapp.jl from TowSty"
   end
 
-  serve(port=port)
+  serve(port=port, middleware=[errorMiddleware])
 end
 
 """
