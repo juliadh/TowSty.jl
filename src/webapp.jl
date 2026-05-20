@@ -107,7 +107,7 @@ end
 
   # check hash
   if !checkhash(hash)
-    message = Dict(:message => "Clé de vérification erronée. La mise à jour est annulée !")
+    message = Dict{Symbol, Any}(:message => "Clé de vérification erronée. La mise à jour est annulée !")
   else
     # Hash is valid, proceed with update
     try
@@ -119,7 +119,7 @@ end
         @warn "Invalid workspace data received"
         restoreworkspace()
         reload_data!()
-        message = Dict(:message => "Une erreur s'est produite lors de la récupération des données. Les anciennes données ont été restaurées.")
+        message = Dict{Symbol, Any}(:message => "Une erreur s'est produite lors de la récupération des données. Les anciennes données ont été restaurées.")
       else
         try # try to process the new data
           reload_data!()
@@ -131,7 +131,7 @@ end
           @error "Data processing failed" exception=process_error
           restoreworkspace()
           reload_data!()
-          message = Dict(:message => "Erreur lors du traitement des données : $(process_error). La anciennes données ont été restaurées." )
+          message = Dict{Symbol, Any}(:message => "Erreur lors du traitement des données : $(process_error). La anciennes données ont été restaurées." )
         end
       end
     catch e # Fetch failed, try to restore
@@ -139,7 +139,7 @@ end
       if restoreworkspace()
         reload_data!()
       end
-      message = Dict(:message => "Erreur lors de la récupération des données : $(e). Les anciennes données ont été restaurées.")
+      message = Dict{Symbol, Any}(:message => "Erreur lors de la récupération des données : $(e). Les anciennes données ont été restaurées.")
     end
   end
 
