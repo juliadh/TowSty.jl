@@ -1,20 +1,4 @@
 """
-    definepaths!()
-
-Wrapper function to redefine all the project paths.
-"""
-function definepaths!()
-  global PROJECT_PATH = pwd()
-  global ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
-  global TEMP_PATH = joinpath(PROJECT_PATH, "temp")
-  global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
-  global DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
-  global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
-  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
-  return nothing
-end
-
-"""
     markdowntohtml(article::Dict)
 
 Process an article by converting its Markdown content to HTML with citations.
@@ -74,64 +58,6 @@ function markdowntoplain(article::Dict)
   rm(BIB_PATH)
 
   return markdown
-end
-
-"""
-    stripyamlheader(md::String)
-
-Remove YAML header from Markdown text.
-Strips the YAML header delimited by `---` at the beginning of the text.
-
-# Argument
-- `md::String`: Markdown text with YAML header
-"""
-function stripyamlheader(md::String)
-  return replace(md, r"(?s)^---\n.*?\n---\n" => "")
-end
-
-
-# @rmq voir paramètre pandoc --wrap=none pour supprimer cette fonction
-"""
-    stripparagraph(html::String)
-
-Extract text content from a single HTML `<p/>` tag.
-Removes newlines, extracts content from `<p/>` tag, and returns the inner text.
-
-# Argument
-- `html::String`: HTML string containing a `<p/>` tag
-"""
-function stripparagraph(html)
-  html = replace(chomp(html), "\n" => " ")
-  p = match(r"<p>(.*?)</p>", html)
-  content = p.captures[1]
-
-  return String(content)
-end
-
-"""
-    string2symbol(data)
-
-Recursively convert dictionary string keys to symbols.
-Works on nested dictionaries and arrays, converting all string keys to symbols.
-
-# Argument
-- `data`: Data structure (Dict, Array) to convert
-"""
-function string2symbol(data)
-  if isa(data, JSON.Object)
-    data = Dict(data)
-  end
-
-  if isa(data, Dict)
-    return Dict(
-      (isa(k, String) ? Symbol(k) : k) => string2symbol(v)
-      for (k, v) in data
-    )
-  elseif isa(data, Array)
-    return [string2symbol(v) for v in data]
-  else
-    return data
-  end
 end
 
 """
@@ -198,6 +124,65 @@ function getyamlheader(markdown)
     logmessage = "        [error] yaml"
     push!(PROCESS_LOG[], logmessage)
     return nothing
+  end
+end
+
+
+"""
+    stripyamlheader(md::String)
+
+Remove YAML header from Markdown text.
+Strips the YAML header delimited by `---` at the beginning of the text.
+
+# Argument
+- `md::String`: Markdown text with YAML header
+"""
+function stripyamlheader(md::String)
+  return replace(md, r"(?s)^---\n.*?\n---\n" => "")
+end
+
+
+# @rmq voir paramètre pandoc --wrap=none pour supprimer cette fonction
+"""
+    stripparagraph(html::String)
+
+Extract text content from a single HTML `<p/>` tag.
+Removes newlines, extracts content from `<p/>` tag, and returns the inner text.
+
+# Argument
+- `html::String`: HTML string containing a `<p/>` tag
+"""
+function stripparagraph(html)
+  html = replace(chomp(html), "\n" => " ")
+  p = match(r"<p>(.*?)</p>", html)
+  content = p.captures[1]
+
+  return String(content)
+end
+
+"""
+    string2symbol(data)
+
+Recursively convert dictionary string keys to symbols.
+Works on nested dictionaries and arrays, converting all string keys to symbols.
+
+# Argument
+- `data`: Data structure (Dict, Array) to convert
+"""
+function string2symbol(data)
+  if isa(data, JSON.Object)
+    data = Dict(data)
+  end
+
+  if isa(data, Dict)
+    return Dict(
+      (isa(k, String) ? Symbol(k) : k) => string2symbol(v)
+      for (k, v) in data
+    )
+  elseif isa(data, Array)
+    return [string2symbol(v) for v in data]
+  else
+    return data
   end
 end
 

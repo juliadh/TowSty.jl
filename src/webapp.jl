@@ -118,11 +118,11 @@ end
       if isnothing(data) || !haskey(data, :name) # Invalid data received
         @warn "Invalid workspace data received"
         restoreworkspace()
-        reload_data!()
+        reloaddata()
         message = Dict{Symbol, Any}(:message => "Une erreur s'est produite lors de la récupération des données. Les anciennes données ont été restaurées.")
       else
         try # try to process the new data
-          reload_data!()
+          reloaddata()
           message = Dict(
             :message => "Données mises à jour avec succès !",
             :log => processlog()
@@ -130,14 +130,14 @@ end
         catch process_error # Processing failed, restore backup
           @error "Data processing failed" exception=process_error
           restoreworkspace()
-          reload_data!()
+          reloaddata()
           message = Dict{Symbol, Any}(:message => "Erreur lors du traitement des données : $(process_error). La anciennes données ont été restaurées." )
         end
       end
     catch e # Fetch failed, try to restore
       @error "Update failed" exception=e
       if restoreworkspace()
-        reload_data!()
+        reloaddata()
       end
       message = Dict{Symbol, Any}(:message => "Erreur lors de la récupération des données : $(e). Les anciennes données ont été restaurées.")
     end
@@ -146,7 +146,7 @@ end
   templatepath = joinpath(TEMPLATES_PATH, "log.html")
   template = read(templatepath, String)
   render = otera(template)
-  
+
   message[:homeurl] = route("/")
   if !haskey(message, :log)
     message[:log] = []

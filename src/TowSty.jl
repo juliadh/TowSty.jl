@@ -20,7 +20,7 @@ function __init__()
   global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
   global DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
   global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
-  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
+  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # citation style
   global BASEURL = ""  # Default base URL path without leading slash (e.g., "" for root, "blog" for /blog/)
 end
 
@@ -34,6 +34,6 @@ include("static.jl")
 include("httperrors.jl")
 include("deploy.jl")
 
-export newproject, templates, generatehash, getworkspace, toaster, bake, meta, corpuses, articles, workspace, definepaths!
+export newproject, templates, generatehash, getworkspace, toaster, bake, meta, corpuses, articles, workspace
 
 end

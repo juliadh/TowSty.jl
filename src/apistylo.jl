@@ -4,7 +4,7 @@
 Instantiate a GraphQL client.
 
 # Argument
-- `apikey::String`: The API key for authentication with Stylo
+- `apikey::String`: The Stylo API key for authentication
 
 # Return
 A configured GraphQL client for the Stylo API.
@@ -24,7 +24,7 @@ If `backup` is true, creates a backup of the existing `workspace.json` before up
 
 # Arguments
 - `id::String`: The workspace id to fetch
-- `apikey::String`: The Stylo API key for authentication
+- `apikey::String`: The Stylo API key
 
 # Keyword argument
 - `backup::Bool`: Whether to create a backup before updating (default: false)

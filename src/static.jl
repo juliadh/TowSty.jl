@@ -14,36 +14,29 @@ function freeze(outputdir::String; baseurl::String="")
   println("Generating static site in: $outputdir")
   println("Base URL: $baseurl")
 
-  # Create the output directory
   mkpath(outputdir)
 
-  # Copy static assets
   println("Copying static assets...")
   copyassets(outputdir, baseurl)
 
-  # Generate the home page
   println("Generating the home page...")
   statichomepage(outputdir, baseurl)
 
-  # Generate corpus pages
   println("Generating corpus pages...")
   for corpus in Base.invokelatest(corpuses)
     staticcorpuspage(outputdir, corpus, baseurl)
   end
 
-  # Generate article pages
   println("Generating article pages...")
   for article in Base.invokelatest(articles)
     staticarticlepage(outputdir, article, baseurl)
   end
 
-  # Generate single pages
   println("Generating single pages...")
   for page in Base.invokelatest(singlepages)
     staticsinglepagepage(outputdir, page, baseurl)
   end
 
-  # Generate search page and search data JSON
   println("Generating search page and data...")
   staticsearchpage(outputdir, baseurl)
   staticsearchdata(outputdir)

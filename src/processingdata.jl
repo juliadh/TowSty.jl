@@ -44,7 +44,7 @@ function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
   articleids = [article[:_id] for article in articles]
 
   remainingarticles = filter(a -> !in(a[:_id], articleids), workspace[:articles])
-  
+
   singlepages = filter(a -> startswith(a[:title], "__"), remainingarticles)
   orphans = filter(a -> !startswith(a[:title], "__"), remainingarticles)
 
@@ -52,7 +52,7 @@ function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
   push!(PROCESS_LOG[], logmessage)
   println(logmessage)
   processedsingle = filter(!isnothing, [processarticle(Dict(:article => s), Dict(:path => "", :name => "")) for s in singlepages])
-  
+
   logmessage = "  [orphans]"
   push!(PROCESS_LOG[], logmessage)
   println(logmessage)
@@ -209,7 +209,7 @@ function processlog()
 end
 
 """
-    ensure_data_loaded()
+
 
 Ensure that the TowSty data is loaded.
 
@@ -217,12 +217,12 @@ This function checks if the data cache is empty.
 If it is, it loads the sources and processes them, and stores the result in the cache.
 Subsequent calls return the cached data without reloading.
 
-See also [`reload_data!()`](@ref) to force refresh of the cached data.
+See also [`reloaddata()`](@ref) to force refresh of the cached data.
 
 # Return
 See [`processdata`](@ref).
 """
-function ensure_data_loaded()
+function loaddata()
   if isempty(DATA_CACHE[])
     sources = loadsources()
     data = processdata(sources, BASEURL)
@@ -234,7 +234,7 @@ function ensure_data_loaded()
 end
 
 """
-    reload_data!()
+    reloaddata()
 
 Force a complete reload of the TowSty data from the workspace file.
 
@@ -243,9 +243,9 @@ This function clears the internal data cache and reloads all data from the sourc
 # Return
 See [`processdata`](@ref).
 """
-function reload_data!()
+function reloaddata()
   DATA_CACHE[] = Dict()
-  return ensure_data_loaded()
+  return loaddata()
 end
 
 """
@@ -260,7 +260,7 @@ This function provides access to the raw workspace data loaded from the
 A Dict containing the complete workspace data structure
 """
 function workspace()
-  return ensure_data_loaded()[:workspace]
+  return loaddata()[:workspace]
 end
 
 """
@@ -278,7 +278,7 @@ A Vector of Dict, where each Dict represents a processed corpus with fields:
 - `:description`: HTML-formatted description
 """
 function corpuses()
-  return ensure_data_loaded()[:corpuses]
+  return loaddata()[:corpuses]
 end
 
 """
@@ -301,7 +301,7 @@ A Vector of Dict, where each Dict represents a processed article with keys inclu
 - And all YAML header fields
 """
 function articles()
-  return ensure_data_loaded()[:articles]
+  return loaddata()[:articles]
 end
 
 """
@@ -319,7 +319,7 @@ See also [`singlepages`](@ref).
 A Vector of processed orphan article Dict objects
 """
 function orphans()
-  return ensure_data_loaded()[:orphans]
+  return loaddata()[:orphans]
 end
 
 """
@@ -337,7 +337,7 @@ See also [`orphans`](@ref).
 A Vector of processed single page Dict objects
 """
 function singlepages()
-  return ensure_data_loaded()[:singlepages]
+  return loaddata()[:singlepages]
 end
 
 """
@@ -354,5 +354,5 @@ A Dict containing:
 - `:nav` - Navigation array with entries for each corpus and bibliography
 """
 function meta()
-  return ensure_data_loaded()[:meta]
+  return loaddata()[:meta]
 end

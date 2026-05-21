@@ -45,7 +45,6 @@ function gethome(baseurl::String="")
   return data
 end
 
-# @rmq revoir les messages d'erreur, s'aligner sur ce qui est attendu
 """
     getcorpus(corpusname::String, baseurl::String="")
 
@@ -128,7 +127,6 @@ function getarticlebyid(articleid::String, baseurl::String="")
 
   if articleidx === nothing
     metadata = meta()
-
     return Dict(
       :error => true,
       :message => "Article introuvable"
@@ -149,7 +147,6 @@ function getarticlebyid(articleid::String, baseurl::String="")
   return data
 end
 
-# @rmq revoir les messages d'erreur, s'aligner sur ce qui est attendu
 """
     getarticle(corpusname::String, article::String, baseurl::String="")
 

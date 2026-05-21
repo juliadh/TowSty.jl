@@ -9,7 +9,6 @@ Deploy a TowSty webapp.
 """
 function toaster(; port::Int=8888, baseurl::String="")
 
-  #definepaths!()
   # Set global base URL for webapp
   global BASEURL = baseurl
   message = baseurl == "" ? "/" : baseurl
