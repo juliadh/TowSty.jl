@@ -12,15 +12,25 @@ using YAML
 using Pandoc
 using Dates
 
-function __init__()
+"""
+    definepaths()
+
+Wrapper function to redefine all the project paths.
+"""
+function definepaths()
   global PROJECT_PATH = pwd()
-  @info "Project is at $(PROJECT_PATH)"
   global ASSETS_PATH = joinpath(PROJECT_PATH, "assets")
   global TEMP_PATH = joinpath(PROJECT_PATH, "temp")
   global TEMPLATES_PATH = joinpath(PROJECT_PATH, "templates")
   global DATA_PATH = joinpath(PROJECT_PATH, "content", "workspace.json")
   global BIB_PATH = joinpath(TEMP_PATH, "bib.bib")  # Bibliography files are created on the fly
-  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # citation style
+  global CSL_PATH = joinpath(ASSETS_PATH, "static/csl/style.csl")  # fichier csl / citations bibliographiques
+  return nothing
+end
+
+function __init__()
+  definepaths()
+  @info "Project is at $(PROJECT_PATH)"
   global BASEURL = ""  # Default base URL path without leading slash (e.g., "" for root, "blog" for /blog/)
 end
 
