@@ -530,16 +530,14 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 version = "1.11.0"
 
 [[deps.TowSty]]
-deps = ["Dates", "GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "TowStyTemplates", "URIs", "Unicode", "YAML"]
+deps = ["Dates", "GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "URIs", "Unicode", "YAML"]
 path = "."
 uuid = "868292e2-f7aa-4e91-a674-807902015840"
 version = "0.5.1"
 
 [[deps.TowStyTemplates]]
 deps = ["Random"]
-git-tree-sha1 = "3401b6fc9f01f3f9873ee30cd5619cf3b667a556"
-repo-rev = "main"
-repo-url = "https://gitlab.huma-num.fr/ceen/towsty/towstytemplates.jl.git"
+git-tree-sha1 = "9e7231abb4ae5e748969c49e38ca1b9f97e75265"
 uuid = "26c3e8b2-b2ea-4c13-8a2d-a4d529bbbc89"
 version = "0.1.0"
 
