@@ -1,6 +1,7 @@
 module TowSty
 
-using TowStyTemplates
+import TowStyTemplates
+using TowStyTemplates: templates, generatehash
 using HTTP
 using URIs
 using GraphQLClient
@@ -32,6 +33,18 @@ function __init__()
   definepaths()
   @info "Project is at $(PROJECT_PATH)"
   global BASEURL = ""  # Default base URL path without leading slash (e.g., "" for root, "blog" for /blog/)
+end
+
+"""
+    newproject(dir; template="jj", changedir=true, verbose=true)
+
+Wrapper function for `TowStyTemplates.newproject`.
+This function also redefines the project paths.
+"""
+function newproject(dir::String="project"; template::String="jj", changedir::Bool=true, verbose::Bool=true)
+  TowStyTemplates.newproject(dir; template=template, changedir=changedir, verbose=verbose)
+  (changedir || dir == ".") && definepaths()
+  return nothing
 end
 
 include("types.jl")

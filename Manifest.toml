@@ -103,9 +103,9 @@ version = "0.1.11"
 
 [[deps.Expat_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "8f05e9a2e7c2e3eb524102bb2926c5743c07fbe1"
+git-tree-sha1 = "c307cd83373868391f3ac30b41530bc5d5d05d08"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
-version = "2.8.0+0"
+version = "2.8.1+0"
 
 [[deps.FilePathsBase]]
 deps = ["Compat", "Dates"]
@@ -530,16 +530,16 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 version = "1.11.0"
 
 [[deps.TowSty]]
-deps = ["Dates", "GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "URIs", "Unicode", "YAML"]
+deps = ["Dates", "GraphQLClient", "HTTP", "JSON", "OteraEngine", "Oxygen", "Pandoc", "TowStyTemplates", "URIs", "Unicode", "YAML"]
 path = "."
 uuid = "868292e2-f7aa-4e91-a674-807902015840"
 version = "0.5.1"
 
 [[deps.TowStyTemplates]]
 deps = ["Random"]
-git-tree-sha1 = "9e7231abb4ae5e748969c49e38ca1b9f97e75265"
+git-tree-sha1 = "448b373323f506403e8e9a1ba785eed5edf38792"
 uuid = "26c3e8b2-b2ea-4c13-8a2d-a4d529bbbc89"
-version = "0.1.0"
+version = "0.1.2"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
