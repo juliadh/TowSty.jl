@@ -15,6 +15,6 @@ makedocs(;
 )
 
 
-# deploydocs(
-#     repo = "github.com/juliadh/TowSty.jl.git",
-# )
+deploydocs(
+    repo = "github.com/juliadh/TowSty.jl.git",
+)
