@@ -1,6 +1,6 @@
 name = "TowSty"
 uuid = "868292e2-f7aa-4e91-a674-807902015840"
-version = "0.5.3"
+version = "0.5.4"
 authors = ["Josselin Morvan <morvan.josselin@gmail.com>"]
 
 [workspace]

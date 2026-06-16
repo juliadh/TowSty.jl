@@ -26,7 +26,7 @@ function gethome(baseurl::String="")
   # Check if an __index single page exists
   pages = singlepages()
   indexidx = findfirst(p -> p[:label] == "__index", pages)
-  
+
   content = Dict(
     :news => news,
     :article => ""
@@ -70,7 +70,6 @@ function getcorpus(corpusname::String, baseurl::String="")
 
   if isempty(matches)
     metadata = meta()
-
     return Dict(
       :error => true,
       :message => "Corpus introuvable"
@@ -87,7 +86,6 @@ function getcorpus(corpusname::String, baseurl::String="")
   metadata[:breadcrumb] = [
     Dict(:name => corpus[:name], :path => corpus[:path])
   ]
-
 
   data = Dict(
     :meta => metadata,
@@ -184,7 +182,6 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
   metadata = corpus[:meta]
   breadcrumb = Dict(:name => article[:title], :path => article[:path] )
   push!(metadata[:breadcrumb], breadcrumb)
-
 
   data = Dict(
     :meta => metadata,
