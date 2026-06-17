@@ -87,6 +87,12 @@ end
   return templaterender(templatepath, data)
 end
 
+@get route("/rss") function()
+
+  return HTTP.Response(200, ["Content-Type" => "application/xml"], body=generatefeed())
+end
+
+
 @get route("/workspace") function (req::HTTP.Request)
   templatepath = joinpath(TEMPLATES_PATH, "workspace.html")
   template = read(templatepath, String)
