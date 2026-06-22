@@ -12,6 +12,7 @@ using JSON
 using YAML
 using Pandoc
 using Dates
+using XML
 
 """
     definepaths()

@@ -266,3 +266,44 @@ function searchindex()
   return indexedarticles
 end
 
+"""
+    generatefeed()
+
+Generate rss feed.
+
+"""
+function generatefeed()
+  feed = XML.Document()
+  dec = XML.Declaration(; version="1.0", encoding="UTF-8")
+  rss = XML.Element("rss"; version="2.0")
+  chnl = XML.Element("channel")
+  title = XML.Element("title", workspace()[:name])
+  link = XML.Element("link", "@todo")
+  description = XML.Element("description", workspace()[:description])
+
+  push!(chnl, title)
+  push!(chnl, link)
+
+
+  for a in articles()
+    item = XML.Element("item")
+    title = XML.Element("title", a[:title])
+    link = XML.Element("link", a[:path])
+    guid = XML.Element("guid", a[:_id])
+    pubdate = XML.Element("pubDate", a[:createdAt])
+
+    push!(item, title)
+    push!(item, link)
+    push!(item, guid)
+    push!(item, pubdate)
+
+    push!(chnl, item)
+  end
+
+  push!(rss, chnl)
+
+  push!(feed, dec)
+  push!(feed, rss)
+
+  return XML.write(feed)
+end
