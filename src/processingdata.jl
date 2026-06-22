@@ -28,13 +28,13 @@ A Dict with the following keys :
 - `:singlepages` - Single pages (articles with title starting with `__`)
 - `:meta` - Workspace metadata including navigation
 """
-function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
+function processdata(workspace::Dict{Symbol, Any}, mountpath::String)
   logmessage = "[workspace] $(workspace[:name])"
   PROCESS_LOG[] = String[]
   push!(PROCESS_LOG[], logmessage)
   println(logmessage)
 
-  corpuses = [processcorpus(corpus, baseurl) for corpus in workspace[:corpus]]
+  corpuses = [processcorpus(corpus, mountpath) for corpus in workspace[:corpus]]
 
   articles = Vector{Dict{Symbol, Any}}()
   for c in corpuses
@@ -75,7 +75,7 @@ function processdata(workspace::Dict{Symbol, Any}, baseurl::String)
     :articles => sorted,
     :meta => Dict(
       :workspacename => workspace[:name],
-      :baseurl => baseurl,
+      :mountpath => mountpath,
       :nav => vcat(
         [Dict(:name => c[:name], :path => formatpath(c[:path])) for c in corpuses],
         singlepagesnav
@@ -95,17 +95,17 @@ Wrapper to process the data from a corpus.
 # Return
 A processed corpus Dict
 """
-function processcorpus(corpus::Dict{Symbol, Any}, baseurl::String)
+function processcorpus(corpus::Dict{Symbol, Any}, mountpath::String)
   logmessage = "  [corpus] $(corpus[:name])"
   push!(PROCESS_LOG[], logmessage)
   println(logmessage)
 
   corpusinfo = Dict(
     :name => corpus[:name],
-    :path => joinpath(baseurl, formatpath(corpus[:name]) )
+    :path => joinpath(mountpath, formatpath(corpus[:name]) )
   )
 
-  corpus[:path] = joinpath(baseurl, formatpath(corpus[:name]) )
+  corpus[:path] = joinpath(mountpath, formatpath(corpus[:name]) )
   corpus[:articles] = isempty(corpus[:articles]) ? [] : processarticles(corpus[:articles], corpusinfo)
   corpus[:description] = markdowntohtml(corpus[:description])
 
@@ -226,7 +226,7 @@ See [`processdata`](@ref).
 function loaddata()
   if isempty(DATA_CACHE[])
     sources = loadsources()
-    data = processdata(sources, BASEURL)
+    data = processdata(sources, MOUNTPATH)
     DATA_CACHE[] = data
     logpath = joinpath(TEMP_PATH, "process.log")
     write(logpath, join(PROCESS_LOG[], "\n"))

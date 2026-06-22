@@ -33,7 +33,7 @@ end
 function __init__()
   definepaths()
   @info "Project is at $(PROJECT_PATH)"
-  global BASEURL = ""  # Default base URL path without leading slash (e.g., "" for root, "blog" for /blog/)
+  global MOUNTPATH = "/"  # Default mount path (always starts with /, never ends with /)
 end
 
 """

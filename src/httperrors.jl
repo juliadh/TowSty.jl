@@ -5,7 +5,7 @@ const HTTP_STATUS = Dict(
 
 function errorpage(status::Int, path::String; message::String="")
   label = isempty(message) ? get(HTTP_STATUS, status, "Une erreur s'est produite") : message
-  homeurl = BASEURL == "" ? "/" : "/" * BASEURL
+  homeurl = rstrip(MOUNTPATH, '/') == "/" ? "/" : rstrip(MOUNTPATH, '/')
 
   templatepath = joinpath(PROJECT_PATH, "templates", "error.html")
   if isfile(templatepath)

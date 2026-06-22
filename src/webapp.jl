@@ -1,14 +1,11 @@
 function route(path::String)
-  normalizedbase = rstrip(BASEURL, '/')
-  # baseurl should not start with /, so we add it
-  prefix = normalizedbase == "" ? "" : "/" * normalizedbase
-  return prefix * path
+  return rstrip(MOUNTPATH, '/') * path
 end
 
 staticfiles("assets/static", route("/static"))
 
 @get route("/") function()
-  data = gethome(BASEURL)
+  data = gethome(MOUNTPATH)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
 
   return templaterender(templatepath, data)
@@ -16,7 +13,7 @@ end
 
 # debug
 @get route("/data") function()
-  data = gethome(BASEURL)
+  data = gethome(MOUNTPATH)
 
   return data
 end
@@ -27,14 +24,14 @@ end
   pageidx = findfirst(p -> p[:slug] == slug, pages)
 
   if !isnothing(pageidx)
-    data = getsinglepage(slug, BASEURL)
+    data = getsinglepage(slug, MOUNTPATH)
     get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
     templatepath = joinpath(TEMPLATES_PATH, "article.html")
     return templaterender(templatepath, data)
   end
 
   # otherwise, treat as a corpus
-  data = getcorpus(slug, BASEURL)
+  data = getcorpus(slug, MOUNTPATH)
   get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
   templatepath = joinpath(TEMPLATES_PATH, "corpus.html")
 
@@ -47,19 +44,19 @@ end
   pageidx = findfirst(p -> p[:slug] == slug, pages)
 
   if !isnothing(pageidx)
-    data = getsinglepage(slug, BASEURL)
+    data = getsinglepage(slug, MOUNTPATH)
     get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
     return data
   end
 
   # otherwise, treat as a corpus
-  data = getcorpus(slug, BASEURL)
+  data = getcorpus(slug, MOUNTPATH)
   get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
   return data
 end
 
 @get route("/{corpus}/{article}") function (req::HTTP.Request, corpus::String, article::String)
-  data = getarticle(corpus, article, BASEURL)
+  data = getarticle(corpus, article, MOUNTPATH)
   get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
 
@@ -67,7 +64,7 @@ end
 end
 
 @get route("/{corpus}/{article}/data") function (req::HTTP.Request, corpus::String, article::String)
-  data = getarticle(corpus, article, BASEURL)
+  data = getarticle(corpus, article, MOUNTPATH)
   get(data, :error, false) && return HTTP.Response(404, ["Error-Message" => data[:message]])
 
   return data

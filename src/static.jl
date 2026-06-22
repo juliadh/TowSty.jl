@@ -1,5 +1,5 @@
 """
-    freeze(outputdir::String; baseurl::String="")
+    freeze(outputdir::String; mountpath::String="/")
 
 Wrapper function to generate a static site in `outputdir` from workspace data.
 
@@ -7,38 +7,38 @@ Wrapper function to generate a static site in `outputdir` from workspace data.
 - `outputdir`: Output directory path for the static site
 
 # Keyword argument
-- `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
+- `mountpath`: Mount path for the application (default "/" for root deployment)
 """
-function freeze(outputdir::String; baseurl::String="")
+function freeze(outputdir::String; mountpath::String="/")
 
   println("Generating static site in: $outputdir")
-  println("Base URL: $baseurl")
+  println("Mount path: $mountpath")
 
   mkpath(outputdir)
 
   println("Copying static assets...")
-  copyassets(outputdir, baseurl)
+  copyassets(outputdir, mountpath)
 
   println("Generating the home page...")
-  statichomepage(outputdir, baseurl)
+  statichomepage(outputdir, mountpath)
 
   println("Generating corpus pages...")
   for corpus in Base.invokelatest(corpuses)
-    staticcorpuspage(outputdir, corpus, baseurl)
+    staticcorpuspage(outputdir, corpus, mountpath)
   end
 
   println("Generating article pages...")
   for article in Base.invokelatest(articles)
-    staticarticlepage(outputdir, article, baseurl)
+    staticarticlepage(outputdir, article, mountpath)
   end
 
   println("Generating single pages...")
   for page in Base.invokelatest(singlepages)
-    staticsinglepagepage(outputdir, page, baseurl)
+    staticsinglepagepage(outputdir, page, mountpath)
   end
 
   println("Generating search page and data...")
-  staticsearchpage(outputdir, baseurl)
+  staticsearchpage(outputdir, mountpath)
   staticsearchdata(outputdir)
 
   println("Static site generated successfully!")
@@ -47,15 +47,15 @@ function freeze(outputdir::String; baseurl::String="")
 end
 
 """
-    copyassets(outputdir::String)
+    copyassets(outputdir::String, mountpath::String="/")
 
 Copy static assets (CSS, JS, images) to the output directory.
 
 # Arguments
 - `outputdir`: Output directory path
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 """
-function copyassets(outputdir::String, baseurl::String="")
+function copyassets(outputdir::String, mountpath::String="/")
   assetssrc = joinpath(pwd(), "assets/static")
   assetsdest = joinpath(outputdir, "static")
 
@@ -68,16 +68,16 @@ function copyassets(outputdir::String, baseurl::String="")
 end
 
 """
-    statichomepage(outputdir::String, baseurl::String="")
+    statichomepage(outputdir::String, mountpath::String="/")
 
 Generate the home page (index.html).
 
 # Arguments
 - `outputdir`: Output directory path
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 """
-function statichomepage(outputdir::String, baseurl::String="")
-  data = Base.invokelatest(gethome, baseurl)
+function statichomepage(outputdir::String, mountpath::String="/")
+  data = Base.invokelatest(gethome, mountpath)
   templatepath = joinpath(TEMPLATES_PATH, "index.html")
   html = templaterender_static(templatepath, data)
   filepath = joinpath(outputdir, "index.html")
@@ -86,19 +86,19 @@ function statichomepage(outputdir::String, baseurl::String="")
 end
 
 """
-    staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
+    staticcorpuspage(outputdir::String, corpus::Dict, mountpath::String="")
 
 Generate a corpus page.
 
 # Arguments
 - `outputdir`: Output directory path
 - `corpus`: Corpus data dictionary
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "" for root deployment)
 """
-function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
+function staticcorpuspage(outputdir::String, corpus::Dict, mountpath::String="")
   corpusname = corpus[:path]
   
-  data = Base.invokelatest(getcorpus, corpusname, baseurl)
+  data = Base.invokelatest(getcorpus, corpusname, mountpath)
 
   if get(data, :error, false)
     @warn "Unable to generate page for corpus: $corpusname"
@@ -118,16 +118,16 @@ function staticcorpuspage(outputdir::String, corpus::Dict, baseurl::String="")
 end
 
 """
-    staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
+    staticarticlepage(outputdir::String, article::Dict, mountpath::String="/")
 
 Generate an article page.
 
 # Arguments
 - `outputdir`: Output directory path
 - `article`: Article data dictionary
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 """
-function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
+function staticarticlepage(outputdir::String, article::Dict, mountpath::String="")
   path = article[:path]
   pathparts = splitpath(path)
   
@@ -143,7 +143,7 @@ function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
   # but corpusname should stay encoded
   articlepath_decoded = URIs.unescapeuri(articlepath)
 
-  data = Base.invokelatest(getarticle, corpusname, articlepath_decoded, baseurl)
+  data = Base.invokelatest(getarticle, corpusname, articlepath_decoded, mountpath)
 
   if get(data, :error, false)
     @warn "Unable to generate page for article: $path"
@@ -164,19 +164,19 @@ function staticarticlepage(outputdir::String, article::Dict, baseurl::String="")
 end
 
 """
-    staticsinglepagepage(outputdir::String, page::Dict, baseurl::String="")
+    staticsinglepagepage(outputdir::String, page::Dict, mountpath::String="/")
 
 Generate a single page (article with title starting with `__`).
 
 # Arguments
 - `outputdir`: Output directory path
 - `page`: Single page Dict
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 """
-function staticsinglepagepage(outputdir::String, page::Dict, baseurl::String="")
+function staticsinglepagepage(outputdir::String, page::Dict, mountpath::String="")
   slug_decoded = URIs.unescapeuri(page[:slug])
   
-  data = Base.invokelatest(getsinglepage, page[:slug], baseurl)
+  data = Base.invokelatest(getsinglepage, page[:slug], mountpath)
   templatepath = joinpath(TEMPLATES_PATH, "article.html")
   html = templaterender_static(templatepath, data)
 
@@ -189,17 +189,17 @@ function staticsinglepagepage(outputdir::String, page::Dict, baseurl::String="")
 end
 
 """
-    staticsearchpage(outputdir::String, baseurl::String="")
+    staticsearchpage(outputdir::String, mountpath::String="/")
 
 Generate the search page.
 
 # Arguments
 - `outputdir`: Output directory path
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 """
-function staticsearchpage(outputdir::String, baseurl::String="")
+function staticsearchpage(outputdir::String, mountpath::String="")
   metadata = Base.invokelatest(meta)
-  metadata[:baseurl] = baseurl
+  metadata[:mountpath] = mountpath
 
   data = Dict(
     :meta => metadata

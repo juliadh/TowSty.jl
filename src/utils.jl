@@ -1,4 +1,31 @@
 """
+    normalizemountpath(mountpath::String)::String
+
+Normalize mountpath to always start with / and never end with /.
+Empty string is converted to /.
+
+# Argument
+- `mountpath::String`: Mount path to normalize
+
+# Return
+Normalized mount path starting with / and not ending with /
+"""
+function normalizemountpath(mountpath::String)::String
+  # Remove leading/trailing whitespace
+  mp = strip(mountpath)
+  # Convert empty string to /
+  if isempty(mp) || mp == "/"
+    return "/"
+  end
+  # Ensure it starts with /
+  if !startswith(mp, "/")
+    mp = "/" * mp
+  end
+  # Remove trailing /
+  return rstrip(mp, '/')
+end
+
+"""
     markdowntohtml(article::Dict)
 
 Process an article by converting its Markdown content to HTML with citations.

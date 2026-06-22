@@ -1,18 +1,17 @@
 """
-    toaster(;port::Int=8888; baseurl::String="")
+    toaster(;port::Int=8888; mountpath::String="/")
 
 Deploy a TowSty webapp.
 
 # Keyword arguments
 - `port`: The port used to serve the web application
-- `baseurl`: Base URL path without leading slash (default "" for root, e.g., "blog" for /blog/)
+- `mountpath`: Mount path for the application (default "/" for root, e.g., "/blog" for /blog/)
 """
-function toaster(; port::Int=8888, baseurl::String="")
+function toaster(; port::Int=8888, mountpath::String="/")
 
-  # Set global base URL for webapp
-  global BASEURL = baseurl
-  message = baseurl == "" ? "/" : baseurl
-  @info "Base url set at $(message)"
+  # Set global mount path for webapp
+  global MOUNTPATH = normalizemountpath(mountpath)
+  @info "Mount path set at $(MOUNTPATH)"
 
   if isfile(joinpath(PROJECT_PATH, "model.jl"))
     include(joinpath(PROJECT_PATH, "model.jl"))
@@ -34,7 +33,7 @@ function toaster(; port::Int=8888, baseurl::String="")
 end
 
 """
-    bake(outputdir::String="build"; baseurl::String="")
+    bake(outputdir::String="build"; mountpath::String="/")
 
 This function generates a static site from a Stylo workspace.
 
@@ -42,9 +41,9 @@ This function generates a static site from a Stylo workspace.
 - `outputdir`: Output directory path (default `"build"`)
 
 # Keyword argument
-- `baseurl`: Base URL path without leading slash (default "" for `root`, e.g., `"blog"` for `/blog/`)
+- `mountpath`: Mount path for the application (default `/` for root, e.g., `/blog` for `/blog/`)
 """
-function bake(outputdir::String="build"; baseurl::String="")
+function bake(outputdir::String="build"; mountpath::String="/")
   if isfile(joinpath(PROJECT_PATH, "model.jl"))
     include(joinpath(PROJECT_PATH, "model.jl"))
     @info "Loading user-defined model.jl"
@@ -61,5 +60,5 @@ function bake(outputdir::String="build"; baseurl::String="")
     @info "Loading webapp.jl from TowSty"
   end
 
-  freeze(outputdir, baseurl=baseurl)
+  freeze(outputdir, mountpath=normalizemountpath(mountpath))
 end

@@ -1,6 +1,6 @@
 # @rmq il ne faut pas trier les articles mais seulement les news => voir dans processingdata.jl
 """
-    gethome(baseurl::String="")
+    gethome(mountpath::String="/")
 
 Get data for the home page.
 
@@ -10,14 +10,14 @@ The 5 most recent articles are returned as news.
 Metadata, and all articles and orphans (article not associated with a corpus) are also returned.
 
 # Argument
-- `baseurl`: Base URL for links (default "" for root (`/`) deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 
 # Return
 A Dict with the following keys :
 - `:meta`
 - `:content` (includes `:news`, `:orphans`, `:articles`, and optionally `:indexpage`)
 """
-function gethome(baseurl::String="")
+function gethome(mountpath::String="/")
   narticles = length(articles())
   news = narticles >= 5 ? articles()[1:5] : articles()
 
@@ -46,7 +46,7 @@ function gethome(baseurl::String="")
 end
 
 """
-    getcorpus(corpusname::String, baseurl::String="")
+    getcorpus(corpusname::String, mountpath::String="/")
 
 Get data for a specific corpus page.
 
@@ -56,16 +56,16 @@ In the `:content`, the corpus `:id`, `:name`, `:description` and the list of `:a
 
 # Arguments
 - `corpusname::String`: name of the corpus
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 
 # Return
 A `Dict()` with the following keys :
 - `:meta`
 - `:content`
 """
-function getcorpus(corpusname::String, baseurl::String="")
+function getcorpus(corpusname::String, mountpath::String="/")
   allcorpuses = corpuses()
-  corpuspath = joinpath(baseurl, corpusname)
+  corpuspath = joinpath(mountpath, corpusname)
   matches = filter(c -> c[:path] == corpuspath, allcorpuses)
 
   if isempty(matches)
@@ -103,7 +103,7 @@ end
 
 # @rmq revoir les messages d'erreur, s'aligner sur ce qui est attendu
 """
-    getarticlebyid(articleid::String, baseurl::String="")
+    getarticlebyid(articleid::String, mountpath::String="/")
 
 Get data for a specific article.
 
@@ -111,14 +111,14 @@ This function returns the data for a given article (by its id) page.
 
 # Arguments
 - `articleid::String`: Article identifier
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "" for root deployment)
 
 # Return
 A `Dict()` with the following keys :
 - `:meta`
 - `:content`
 """
-function getarticlebyid(articleid::String, baseurl::String="")
+function getarticlebyid(articleid::String, mountpath::String="/")
   articles = workspace()[:articles]
 
   articleidx = findfirst(a -> a[:_id] == articleid, articles)
@@ -146,7 +146,7 @@ function getarticlebyid(articleid::String, baseurl::String="")
 end
 
 """
-    getarticle(corpusname::String, article::String, baseurl::String="")
+    getarticle(corpusname::String, article::String, mountpath::String="/")
 
 Get data for a specific article.
 
@@ -156,18 +156,18 @@ The corpus metadatas are fetched and the breadcrumb trail is enriched with the a
 # Arguments
 - `corpusname::String`: name of the corpus
 - `article::String`: Article slug/identifier
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "/" for root deployment)
 
 # Return
 A `Dict()` with the following keys :
 - `:meta`
 - `:content`
 """
-function getarticle(corpusname::String, article::String, baseurl::String="")
-  corpus = getcorpus(corpusname, baseurl)
+function getarticle(corpusname::String, article::String, mountpath::String="/")
+  corpus = getcorpus(corpusname, mountpath)
 
   list = articles()
-  articleidx = findfirst(a -> a[:path] == joinpath(baseurl, corpusname, URIs.escapepath(article)), list)
+  articleidx = findfirst(a -> a[:path] == joinpath(mountpath, corpusname, URIs.escapepath(article)), list)
 
   if articleidx === nothing
     metadata = meta()
@@ -192,7 +192,7 @@ function getarticle(corpusname::String, article::String, baseurl::String="")
 end
 
 """
-    getsinglepage(slug::String, baseurl::String="")
+    getsinglepage(slug::String, mountpath::String="/")
 
 Get data for a single page by its slug.
 
@@ -201,14 +201,14 @@ They are not associated with any corpus but appear in the navigation menu.
 
 # Arguments
 - `slug::String`: Slug of the single page (e.g., "__bibliographie")
-- `baseurl`: Base URL for links (default "" for root deployment)
+- `mountpath`: Mount path for links (default "" for root deployment)
 
 # Return
 A `Dict()` with the following keys :
 - `:meta`
 - `:content`
 """
-function getsinglepage(slug::String, baseurl::String="")
+function getsinglepage(slug::String, mountpath::String="/")
   pages = singlepages()
   pageidx = findfirst(p -> p[:slug] == slug, pages)
 
