@@ -26,6 +26,24 @@ function normalizemountpath(mountpath::String)::String
 end
 
 """
+    normalizesiteurl(siteurl::String)::String
+
+Normalize siteurl by stripping whitespace and any trailing slash.
+
+# Argument
+- `siteurl::String`: Canonical site URL to normalize
+
+# Return
+Normalized site URL without trailing slash
+"""
+function normalizesiteurl(siteurl::String)::String
+  normalized = strip(siteurl)
+  isempty(normalized) && return ""
+
+  return rstrip(normalized, '/')
+end
+
+"""
     markdowntohtml(article::Dict)
 
 Process an article by converting its Markdown content to HTML with citations.

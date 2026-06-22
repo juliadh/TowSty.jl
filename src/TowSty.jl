@@ -34,6 +34,7 @@ function __init__()
   definepaths()
   @info "Project is at $(PROJECT_PATH)"
   global MOUNTPATH = "/"  # Default mount path (always starts with /, never ends with /)
+  global SITEURL = ""  # Default canonical site URL, empty disables absolute RSS links
 end
 
 """

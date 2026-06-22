@@ -171,7 +171,7 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
   meta = merge(Dict(pairs(articledata)...), Dict(pairs(yaml)...))
   delete!(meta, :workingVersion)
   delete!(meta, :title)
-  meta[:stylo] = articledata[:workingVersion][:yaml] |> string2symbol
+  meta[:stylo] = YAML.load(articledata[:workingVersion][:yaml]) |> string2symbol
 
   if(haskey(meta, :abstract))
     meta[:abstract] =  markdowntohtml(meta[:abstract]) |> stripparagraph |> String

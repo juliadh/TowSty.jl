@@ -277,8 +277,9 @@ function generatefeed()
   dec = XML.Declaration(; version="1.0", encoding="UTF-8")
   rss = XML.Element("rss"; version="2.0")
   chnl = XML.Element("channel")
+  homeurl = isempty(SITEURL) ? "/" : SITEURL
   title = XML.Element("title", workspace()[:name])
-  link = XML.Element("link", "@todo")
+  link = XML.Element("link", homeurl)
   description = XML.Element("description", workspace()[:description])
 
   push!(chnl, title)
@@ -287,9 +288,10 @@ function generatefeed()
 
   for a in articles()
     item = XML.Element("item")
+    articleurl = isempty(SITEURL) ? a[:path] : SITEURL * a[:path]
     title = XML.Element("title", a[:title])
-    link = XML.Element("link", a[:path])
-    guid = XML.Element("guid", a[:_id])
+    link = XML.Element("link", articleurl)
+    guid = XML.Element("guid", articleurl)
     pubdate = XML.Element("pubDate", a[:createdAt])
 
     push!(item, title)
