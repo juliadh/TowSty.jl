@@ -102,8 +102,8 @@ end
   return Base.invokelatest(render, data)
 end
 
-@get route("/workspace/update") function (req::HTTP.Request)
-  form = queryparams(req)
+@post route("/workspace/update") function (req::HTTP.Request)
+  form = formdata(req)
   styloapikey = get(form, "styloapikey", "")
   workspaceid = get(form, "workspaceid", "")
   hash = get(form, "hash", "")
