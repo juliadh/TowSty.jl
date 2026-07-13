@@ -204,9 +204,19 @@ end
 # Lazy-loaded cache to avoid IO at module load
 const DATA_CACHE = Ref{Dict}(Dict())
 const PROCESS_LOG = Ref{Vector{String}}(String[])
+const DATA_CACHE_LOCK = ReentrantLock()
 
 function processlog()
   return PROCESS_LOG[]
+end
+
+function builddata()
+  sources = loadsources()
+  data = processdata(sources, MOUNTPATH)
+  logpath = joinpath(TEMP_PATH, "process.log")
+  write(logpath, join(PROCESS_LOG[], "\n"))
+
+  return data
 end
 
 """
@@ -224,14 +234,17 @@ See also [`reloaddata()`](@ref) to force refresh of the cached data.
 See [`processdata`](@ref).
 """
 function loaddata()
-  if isempty(DATA_CACHE[])
-    sources = loadsources()
-    data = processdata(sources, MOUNTPATH)
-    DATA_CACHE[] = data
-    logpath = joinpath(TEMP_PATH, "process.log")
-    write(logpath, join(PROCESS_LOG[], "\n"))
+  isempty(DATA_CACHE[]) || return DATA_CACHE[]
+
+  lock(DATA_CACHE_LOCK)
+  try
+    if isempty(DATA_CACHE[])
+      DATA_CACHE[] = builddata()
+    end
+    return DATA_CACHE[]
+  finally
+    unlock(DATA_CACHE_LOCK)
   end
-  return DATA_CACHE[]
 end
 
 """
@@ -245,8 +258,13 @@ This function clears the internal data cache and reloads all data from the sourc
 See [`processdata`](@ref).
 """
 function reloaddata()
-  DATA_CACHE[] = Dict()
-  return loaddata()
+  lock(DATA_CACHE_LOCK)
+  try
+    DATA_CACHE[] = builddata()
+    return DATA_CACHE[]
+  finally
+    unlock(DATA_CACHE_LOCK)
+  end
 end
 
 """

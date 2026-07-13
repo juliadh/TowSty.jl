@@ -54,9 +54,16 @@ and cleans up the temporary file. Uses CSL for citation formatting.
 - `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) keys
 """
 function markdowntohtml(article::Dict)
-  write(BIB_PATH, article[:bib])
-  markdown = run(Pandoc.Converter(input=article[:md], bibliography=BIB_PATH, csl=CSL_PATH, citeproc=true))
-  rm(BIB_PATH)
+  mkpath(TEMP_PATH)
+  tempdir = mktempdir(TEMP_PATH)
+  bibpath = joinpath(tempdir, "bib.bib")
+
+  markdown = try
+    write(bibpath, article[:bib])
+    run(Pandoc.Converter(input=article[:md], bibliography=bibpath, csl=CSL_PATH, citeproc=true))
+  finally
+    rm(tempdir; recursive=true, force=true)
+  end
 
   return markdown
 end
@@ -98,9 +105,16 @@ and cleans up the temporary file. Uses CSL for citation formatting.
 - `article::Dict`: Dictionary containing `:md` (markdown) and `:bib` (bibliography) keys
 """
 function markdowntoplain(article::Dict)
-  write(BIB_PATH, article[:bib])
-  markdown = run(Pandoc.Converter(input=article[:md], from="markdown", to="plain", bibliography=BIB_PATH, csl=CSL_PATH, citeproc=true))
-  rm(BIB_PATH)
+  mkpath(TEMP_PATH)
+  tempdir = mktempdir(TEMP_PATH)
+  bibpath = joinpath(tempdir, "bib.bib")
+
+  markdown = try
+    write(bibpath, article[:bib])
+    run(Pandoc.Converter(input=article[:md], from="markdown", to="plain", bibliography=bibpath, csl=CSL_PATH, citeproc=true))
+  finally
+    rm(tempdir; recursive=true, force=true)
+  end
 
   return markdown
 end
