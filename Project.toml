@@ -1,6 +1,6 @@
 name = "TowSty"
 uuid = "868292e2-f7aa-4e91-a674-807902015840"
-version = "0.6.1"
+version = "0.6.2"
 authors = ["Josselin Morvan <morvan.josselin@gmail.com>"]
 
 [workspace]
@@ -28,7 +28,7 @@ JSON = "1.3.0"
 OteraEngine = "1.1.3"
 Oxygen = "1.8.0"
 Pandoc = "0.4.4"
-TowStyTemplates = "0.1.0"
+TowStyTemplates = "0.1.7"
 URIs = "1.6.1"
 Unicode = "1.11.0"
 XML = "0.3.8"
