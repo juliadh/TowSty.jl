@@ -23,7 +23,7 @@ function freeze(outputdir::String; mountpath::String="/")
   statichomepage(outputdir, mountpath)
 
   println("Generating corpus pages...")
-  for corpus in Base.invokelatest(corpuses)
+  for corpus in Base.invokelatest(corpora)
     staticcorpuspage(outputdir, corpus, mountpath)
   end
 
@@ -43,7 +43,7 @@ function freeze(outputdir::String; mountpath::String="/")
 
   println("Static site generated successfully!")
   println("   → Directory: $outputdir")
-  println("   → Pages: $(length(Base.invokelatest(corpuses))) corpus, $(length(Base.invokelatest(articles))) articles")
+  println("   → Pages: $(length(Base.invokelatest(corpora))) corpus, $(length(Base.invokelatest(articles))) articles")
 end
 
 """

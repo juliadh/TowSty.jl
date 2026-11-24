@@ -22,7 +22,7 @@ This function is a wrapper to process the data from a workspace.
 # Return
 A Dict with the following keys :
 - `:workspace` - The complete workspace data
-- `:corpuses` - Processed corpus data
+- `:corpora` - Processed corpus data
 - `:articles` - Sorted list of all articles
 - `:orphans` - Articles not associated with any corpus (and not single pages)
 - `:singlepages` - Single pages (articles with title starting with `__`)
@@ -34,16 +34,16 @@ function processdata(workspace::Dict{Symbol, Any}, mountpath::String)
   push!(PROCESS_LOG[], logmessage)
   println(logmessage)
 
-  corpuses = [processcorpus(corpus, mountpath) for corpus in workspace[:corpus]]
+  corpora = [processcorpus(corpus, mountpath) for corpus in workspace[:corpora]]
 
   articles = Vector{Dict{Symbol, Any}}()
-  for c in corpuses
+  for c in corpora
     append!(articles, c[:articles])
   end
 
-  articleids = [article[:_id] for article in articles]
+  articleids = [article[:id] for article in articles]
 
-  remainingarticles = filter(a -> !in(a[:_id], articleids), workspace[:articles])
+  remainingarticles = filter(a -> !in(a[:id], articleids), workspace[:articles])
 
   singlepages = filter(a -> startswith(a[:title], "__"), remainingarticles)
   orphans = filter(a -> !startswith(a[:title], "__"), remainingarticles)
@@ -69,7 +69,7 @@ function processdata(workspace::Dict{Symbol, Any}, mountpath::String)
 
   return Dict(
     :workspace => workspace,
-    :corpuses => corpuses,
+    :corpora => corpora,
     :orphans => processorphans,
     :singlepages => processedsingle,
     :articles => sorted,
@@ -77,7 +77,7 @@ function processdata(workspace::Dict{Symbol, Any}, mountpath::String)
       :workspacename => workspace[:name],
       :mountpath => mountpath,
       :nav => vcat(
-        [Dict(:name => c[:name], :path => formatpath(c[:path])) for c in corpuses],
+        [Dict(:name => c[:name], :path => formatpath(c[:path])) for c in corpora],
         singlepagesnav
       )
     )
@@ -148,7 +148,7 @@ Converts markdown content to html and processes metadata (yaml header, path, slu
 A formatted article Dict
 """
 function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Dict{Symbol, String})
-  logmessage = "      [article] $(article[:article][:_id]) - $(article[:article][:title])"
+  logmessage = "      [article] $(article[:article][:id]) - $(article[:article][:title])"
   push!(PROCESS_LOG[], logmessage)
   println(logmessage)
 
@@ -163,7 +163,7 @@ function processarticle(article::Dict{Symbol, Dict{Symbol, Any}}, corpusinfo::Di
   html = try
     Dict(:md => articledata[:workingVersion][:md], :bib => articledata[:workingVersion][:bib]) |> markdowntohtml
   catch e
-    @warn "Erreur lors de la convertion Pandoc, l’article ($(articledata[:_id])) est ignoré" exception=e
+    @warn "Erreur lors de la convertion Pandoc, l’article ($(articledata[:id])) est ignoré" exception=e
     push!(PROCESS_LOG[], "        [error] html")
     return nothing
   end
@@ -265,11 +265,11 @@ function workspace()
 end
 
 """
-    corpuses()
+    corpora()
 
-Retrieve all processed corpuses from the workspace.
+Retrieve all processed corpora from the workspace.
 
-Returns a Vector of all corpuses with their processed articles and descriptions, and formatted paths.
+Returns a Vector of all corpora with their processed articles and descriptions, and formatted paths.
 
 # Return
 A Vector of Dict, where each Dict represents a processed corpus with fields:
@@ -278,21 +278,21 @@ A Vector of Dict, where each Dict represents a processed corpus with fields:
 - `:articles`: Vector of articles
 - `:description`: HTML-formatted description
 """
-function corpuses()
-  return loaddata()[:corpuses]
+function corpora()
+  return loaddata()[:corpora]
 end
 
 """
     articles()
 
-List all articles from all corpuses, sorted by creation date.
+List all articles from all corpora, sorted by creation date.
 
-Returns a Vector of processed articles **from all corpuses**,
+Returns a Vector of processed articles **from all corpora**,
 sorted in reverse chronological order (most recent first).
 
 # Return
 A Vector of Dict, where each Dict represents a processed article with keys including:
-- `:_id`: id of the article
+- `:id`: id of the article
 - `:title`: HTML-formatted title
 - `:slug`: URL-friendly title-slug
 - `:path`: path to the article

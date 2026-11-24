@@ -64,9 +64,9 @@ A `Dict()` with the following keys :
 - `:content`
 """
 function getcorpus(corpusname::String, mountpath::String="/")
-  allcorpuses = corpuses()
+  corpuses = corpora()
   corpuspath = joinpath(mountpath, corpusname)
-  matches = filter(c -> c[:path] == corpuspath, allcorpuses)
+  matches = filter(c -> c[:path] == corpuspath, corpuses)
 
   if isempty(matches)
     metadata = meta()
@@ -90,7 +90,7 @@ function getcorpus(corpusname::String, mountpath::String="/")
   data = Dict(
     :meta => metadata,
     :content => Dict(
-      :id => corpus[:_id],
+      :id => corpus[:id],
       :name => corpus[:name],
       :description => corpus[:description],
       :articles => corpus[:articles]
@@ -121,7 +121,7 @@ A `Dict()` with the following keys :
 function getarticlebyid(articleid::String, mountpath::String="/")
   articles = workspace()[:articles]
 
-  articleidx = findfirst(a -> a[:_id] == articleid, articles)
+  articleidx = findfirst(a -> a[:id] == articleid, articles)
 
   if articleidx === nothing
     metadata = meta()
@@ -238,12 +238,12 @@ end
 Generate a search index for Lunr.
 
 This function builds a search index for all articles.
-For each article, it extracts the essential fields (`:_id`, `:title`, `:corpus`,
+For each article, it extracts the essential fields (`:id`, `:title`, `:corpus`,
 markdown content (`:md`) and `:path`) needed for the Lunr search engine.
 
 # Return
 A `Dict()` with the following keys :
-- `:_id`
+- `:id`
 - `:title`
 - `:corpus`
 - `:md`
@@ -253,7 +253,7 @@ function searchindex()
   indexedarticles = []
   for article in articles()
     a = Dict(
-      :_id => article[:_id],
+      :id => article[:id],
       :title => article[:title],
       :corpus => article[:corpus],
       :md => article[:md],

@@ -48,7 +48,7 @@ function getworkspace(workspaceid, apikey; backup::Bool=false)
             name
             description
             articles{
-                _id
+                id
                 title
                 createdAt
                 owner {
@@ -65,14 +65,14 @@ function getworkspace(workspaceid, apikey; backup::Bool=false)
                     bib
                 }
             }
-            corpus{
-                _id
+            corpora{
+                id
                 name
                 description
                 metadata
                 articles{
                     article{
-                        _id
+                        id
                         title
                         createdAt
                         owner {
